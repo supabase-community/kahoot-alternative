@@ -1,7 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Choice, Player, Problem, Session, sessionId, supabase } from '../page'
+import {
+  Answer,
+  Choice,
+  Player,
+  Problem,
+  Session,
+  sessionId,
+  supabase,
+} from '../page'
 
 enum AdminScreens {
   lobby,
@@ -35,20 +43,6 @@ export default function Home() {
         }
       )
       .subscribe()
-
-    const { data, error } = await supabase.from('players').select()
-    const some = [
-      ...data!,
-      ...data!,
-      ...data!,
-      ...data!,
-      ...data!,
-      ...data!,
-      ...data!,
-      ...data!,
-      ...data!,
-    ]
-    setPlayers(some as Player[])
   }
 
   useEffect(() => {
@@ -115,8 +109,79 @@ export default function Home() {
             problemCount={problems!.length}
           ></Quiz>
         )}
+        {currentScreen == AdminScreens.results && (
+          <Results players={players!} problems={problems!}></Results>
+        )}
       </div>
     </main>
+  )
+}
+
+function Results({
+  players,
+  problems,
+}: {
+  players: Player[]
+  problems: Problem[]
+}) {
+  const [finalOrderedPlayers, setOrderedPlayers] = useState<
+    {
+      id: string
+      correctCount: number
+      player: Player | undefined
+    }[]
+  >([])
+
+  const getResults = async () => {
+    const { data, error } = await supabase.from('answers').select()
+    if (error) {
+      return alert(error.message)
+    }
+    const answers = data as Answer[]
+    const correctAnswers = answers.filter((answer) => {
+      const targetProblem = problems.find((problem) => {
+        return problem.id == answer.problem_id
+      })
+      if (!targetProblem) return false
+
+      const targetChoice = targetProblem.choices.find((choice) => {
+        return choice.id == answer.choice_id
+      })
+
+      if (!targetChoice) return false
+      return targetChoice.is_correct
+    })
+
+    const resultMap: { [key: string]: number } = {}
+    correctAnswers.forEach((answer) => {
+      if (!resultMap[answer.player_id]) {
+        resultMap[answer.player_id] = 0
+      }
+      resultMap[answer.player_id]++
+    })
+
+    const orderedPlayers = Object.keys(resultMap)
+      .map((key) => {
+        const targetPlayer = players.find((player) => {
+          player.id = key
+        })
+        return { id: key, correctCount: resultMap[key], player: targetPlayer }
+      })
+      .sort((a, b) => a.correctCount - b.correctCount)
+
+    setOrderedPlayers(orderedPlayers)
+  }
+
+  useEffect(() => {
+    getResults()
+  }, [])
+
+  return (
+    <div>
+      {finalOrderedPlayers.map((player) => (
+        <div key={player.id}>{player.player?.nickname}</div>
+      ))}
+    </div>
   )
 }
 
@@ -256,8 +321,4 @@ function Lobby({ players }: { players: Player[] }) {
       </button>
     </div>
   )
-}
-
-function Results() {
-  return <div></div>
 }
