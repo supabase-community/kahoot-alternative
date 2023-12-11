@@ -121,7 +121,7 @@ function Results({
     {
       id: string
       correctCount: number
-      player: Player | undefined
+      player: Player
     }[]
   >([])
 
@@ -131,6 +131,7 @@ function Results({
       return alert(error.message)
     }
     const answers = data as Answer[]
+    console.log({ answers })
     const correctAnswers = answers.filter((answer) => {
       const targetProblem = problems.find((problem) => {
         return problem.id == answer.problem_id
@@ -144,6 +145,7 @@ function Results({
       if (!targetChoice) return false
       return targetChoice.is_correct
     })
+    console.log({ correctAnswers })
 
     const resultMap: { [key: string]: number } = {}
     correctAnswers.forEach((answer) => {
@@ -152,25 +154,27 @@ function Results({
       }
       resultMap[answer.player_id]++
     })
+    console.log({ resultMap })
 
-    const orderedPlayers = Object.keys(resultMap)
-      .filter((key) => {
-        const targetPlayer = players.find((player) => {
-          player.id = key
-        })
-        if (!targetPlayer) return false
-        return true
-      })
+    // const orderedPlayers = Object.keys(resultMap)
+    const filteredPlayers = Object.keys(resultMap).filter((key) => {
+      console.log({ players })
+      const targetPlayer = players.find((player) => player.id == key)
+      if (!targetPlayer) return false
+      return true
+    })
+
+    console.log({ filteredPlayers })
+
+    const orderedPlayers = filteredPlayers
       .map((key) => {
-        const targetPlayer = players.find((player) => {
-          player.id = key
-        })
-        return { id: key, correctCount: resultMap[key], player: targetPlayer }
+        const targetPlayer = players.find((player) => player.id == key)
+        return { id: key, correctCount: resultMap[key], player: targetPlayer! }
       })
       .sort((a, b) => a.correctCount - b.correctCount)
 
     setOrderedPlayers(orderedPlayers)
-    console.log(orderedPlayers)
+    console.log({ orderedPlayers })
   }
 
   useEffect(() => {
