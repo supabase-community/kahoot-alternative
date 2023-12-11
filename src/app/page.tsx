@@ -1,113 +1,254 @@
-import Image from 'next/image'
+'use client'
+
+import React, { FormEvent, useEffect, useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
+import { setRequestMeta } from 'next/dist/server/request-meta'
+
+const supabase = createClient(
+  'https://aofiufmhphqtsjpatqdy.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvZml1Zm1ocGhxdHNqcGF0cWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDIyNjY4MjIsImV4cCI6MjAxNzg0MjgyMn0.AE6Aq1h7mxmiWI0q-qc0NEcw42MNz0fJDWPWbckaiz0'
+)
+
+type Player = {
+  nickname: string
+  id: string
+}
+
+type Problem = {
+  id: string
+  body: string
+  order: number
+  image_url: string
+  choices: Choice[]
+}
+
+type Choice = {
+  id: string
+  problem_id: string
+  is_correct: boolean
+  body: string
+}
+
+type Answer = {
+  id: string
+  problem_id: string
+  player_id: string
+  choice_id: string
+}
+
+type Session = {
+  id: string
+  current_problem_sequence: number
+}
+
+enum Screens {
+  register,
+  lobby,
+  quiz,
+  // problemShown,
+  // problemAnswering,
+  // problemAnswered,
+  // problemResult,
+  results,
+}
 
 export default function Home() {
+  const onRegisterCompleted = (player: Player) => {
+    console.log(player)
+    setPlayer(player)
+    setCurrentScreen(Screens.lobby)
+  }
+
+  const [player, setPlayer] = useState<Player | null>()
+
+  const [currentScreen, setCurrentScreen] = useState(Screens.register)
+
+  const [problems, setProblems] = useState<Problem[]>()
+
+  const getProblems = async () => {
+    const { data, error } = await supabase
+      .from('problems')
+      .select(`*, choices(*)`)
+      .order('order', { ascending: true })
+    if (error) {
+      getProblems()
+      return
+    }
+    setProblems(data)
+    console.log({ problems: data })
+    const choiceCount = data.map((rows: Problem) => rows.choices.length)
+    console.log({ choiceCount })
+    const correctCount = data.map(
+      (rows) =>
+        rows.choices.filter((choice: Choice) => choice.is_correct).length
+    )
+    console.log({ correctCount })
+  }
+
+  const sessionId = 'dc84bced-bb8b-4bff-b7b1-9eb21cae92ca'
+
+  const [currentProblemSequence, setCurrentProblemSequence] = useState(0)
+
+  const setSessionListner = () => {
+    supabase
+      .channel('session')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'sessions',
+          filter: `id=eq.${sessionId}`,
+        },
+        (payload) => {
+          console.log(payload.new)
+          const session = payload.new as Session
+          setCurrentProblemSequence(session.current_problem_sequence)
+
+          // start the quiz session
+
+          setCurrentScreen(Screens.quiz)
+          console.log({ currentScreen })
+          console.log(session.current_problem_sequence)
+        }
+      )
+      .subscribe()
+  }
+
+  useEffect(() => {
+    getProblems()
+    setSessionListner()
+  }, [])
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+    <main className="flex min-h-screen flex-col items-center justify-between p-12">
+      <div className="max-w-md m-auto p-8 bg-black text-white">
+        {currentScreen == Screens.register && (
+          <Register onRegisterCompleted={onRegisterCompleted}></Register>
+        )}
+        {currentScreen == Screens.lobby && <Lobby player={player!}></Lobby>}
+        {currentScreen == Screens.quiz && (
+          <Quiz
+            problem={problems![currentProblemSequence]}
+            problemCount={problems!.length}
+            playerId={player!.id}
+          ></Quiz>
+        )}
       </div>
     </main>
+  )
+}
+
+function Quiz({
+  problem,
+  problemCount,
+  playerId,
+}: {
+  problem: Problem
+  problemCount: number
+  playerId: string
+}) {
+  const [hasAnswered, setHasAnswered] = useState(false)
+
+  useEffect(() => {
+    setHasAnswered(false)
+  }, [problem.id])
+
+  const answer = async (choiceId: string) => {
+    setHasAnswered(true)
+    const { data, error } = await supabase.from('answers').insert({
+      player_id: playerId,
+      problem_id: problem.id,
+      choice_id: choiceId,
+      answer_time: 100,
+    })
+    if (error) {
+      setHasAnswered(false)
+      alert(error)
+    }
+  }
+
+  if (hasAnswered) {
+    return <div>他のプレーヤーさんの回答が終わるのをお待ちください。</div>
+  }
+
+  return (
+    <div>
+      <div className="absolute left-4 top-4">
+        {problem.order + 1}/{problemCount}
+      </div>
+
+      <h1 className="pb-4 text-xl">{problem.body}</h1>
+      <div className="flex justify-between flex-wrap">
+        {problem.choices.map((choice) => (
+          <div key={choice.id} className="w-1/2 p-1">
+            <button
+              onClick={() => answer(choice.id)}
+              className="p-2 bg-green-500 w-full text-center"
+            >
+              {choice.body}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function Lobby({ player }: { player: Player }) {
+  return (
+    <div>
+      <h1 className="text-xl pb-4">ようこそ{player.nickname}さん！</h1>
+      <p>
+        ゲームに参加できました！画面に名前が表示されるはずです！他の皆様が登録されるのをもう少々お待ちください。
+      </p>
+    </div>
+  )
+}
+
+function Register({
+  onRegisterCompleted: onRegisterComplete,
+}: {
+  onRegisterCompleted: (player: Player) => void
+}) {
+  const onFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setSending(true)
+    console.log(nickname)
+    if (!nickname) {
+      return
+    }
+    const { data: player, error } = await supabase
+      .from('players')
+      .insert({ nickname })
+      .select()
+      .single()
+
+    if (error) {
+      setSending(false)
+
+      return alert(
+        `正常に登録ができませんでした。もう一度お試しください。Error: ${error}`
+      )
+    }
+
+    onRegisterComplete(player)
+  }
+
+  const [nickname, setNickname] = useState('')
+  const [sending, setSending] = useState(false)
+
+  return (
+    <form onSubmit={(e) => onFormSubmit(e)}>
+      <input
+        className="p-2 w-full border border-black text-black"
+        type="text"
+        onChange={(val) => setNickname(val.currentTarget.value)}
+        placeholder="ニックネーム"
+      />
+      <button disabled={sending} className="w-full py-2 bg-amber-500 mt-4">
+        参加
+      </button>
+    </form>
   )
 }
