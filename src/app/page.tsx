@@ -39,6 +39,7 @@ type Answer = {
 type Session = {
   id: string
   current_problem_sequence: number
+  is_done: boolean
 }
 
 enum Screens {
@@ -75,14 +76,13 @@ export default function Home() {
       return
     }
     setProblems(data)
-    console.log({ problems: data })
+
     const choiceCount = data.map((rows: Problem) => rows.choices.length)
-    console.log({ choiceCount })
+
     const correctCount = data.map(
       (rows) =>
         rows.choices.filter((choice: Choice) => choice.is_correct).length
     )
-    console.log({ correctCount })
   }
 
   const sessionId = 'dc84bced-bb8b-4bff-b7b1-9eb21cae92ca'
@@ -101,15 +101,15 @@ export default function Home() {
           filter: `id=eq.${sessionId}`,
         },
         (payload) => {
-          console.log(payload.new)
-          const session = payload.new as Session
-          setCurrentProblemSequence(session.current_problem_sequence)
-
           // start the quiz session
+          const session = payload.new as Session
 
-          setCurrentScreen(Screens.quiz)
-          console.log({ currentScreen })
-          console.log(session.current_problem_sequence)
+          if (session.is_done) {
+            setCurrentScreen(Screens.results)
+          } else {
+            setCurrentScreen(Screens.quiz)
+            setCurrentProblemSequence(session.current_problem_sequence)
+          }
         }
       )
       .subscribe()
@@ -122,7 +122,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-12">
-      <div className="max-w-md m-auto p-8 bg-black text-white">
+      <div className="max-w-md m-auto p-8 bg-black  text-white">
         {currentScreen == Screens.register && (
           <Register onRegisterCompleted={onRegisterCompleted}></Register>
         )}
@@ -134,8 +134,22 @@ export default function Home() {
             playerId={player!.id}
           ></Quiz>
         )}
+        {currentScreen == Screens.results && <Results></Results>}
       </div>
     </main>
+  )
+}
+
+function Results() {
+  return (
+    <div>
+      <h2 className="text-xl pb-4">
+        お疲れ様でした！登壇者の画面を見てください
+      </h2>
+      <p>
+        クイズは楽しんでいただけましたか？ぜひ本日のイベント最後まで楽しんでいってくださいね！
+      </p>
+    </div>
   )
 }
 
@@ -150,12 +164,15 @@ function Quiz({
 }) {
   const [hasAnswered, setHasAnswered] = useState(false)
 
+  const [selectedChoiceId, setSelectedChoiceId] = useState<string>()
+
   useEffect(() => {
     setHasAnswered(false)
   }, [problem.id])
 
   const answer = async (choiceId: string) => {
     setHasAnswered(true)
+    setSelectedChoiceId(choiceId)
     const { data, error } = await supabase.from('answers').insert({
       player_id: playerId,
       problem_id: problem.id,
@@ -166,10 +183,6 @@ function Quiz({
       setHasAnswered(false)
       alert(error)
     }
-  }
-
-  if (hasAnswered) {
-    return <div>他のプレーヤーさんの回答が終わるのをお待ちください。</div>
   }
 
   return (
@@ -183,8 +196,23 @@ function Quiz({
         {problem.choices.map((choice) => (
           <div key={choice.id} className="w-1/2 p-1">
             <button
+              disabled={hasAnswered}
               onClick={() => answer(choice.id)}
-              className="p-2 bg-green-500 w-full text-center"
+              className={`p-2 w-full text-center 
+                ${
+                  selectedChoiceId == choice.id ? 'border-2 border-red-500' : ''
+                }
+              ${
+                hasAnswered
+                  ? selectedChoiceId == choice.id
+                    ? choice.is_correct
+                      ? 'bg-green-500'
+                      : 'bg-red-500'
+                    : choice.is_correct
+                    ? 'bg-green-500'
+                    : 'bg-gray-400'
+                  : 'bg-green-500'
+              }`}
             >
               {choice.body}
             </button>
@@ -246,7 +274,7 @@ function Register({
         onChange={(val) => setNickname(val.currentTarget.value)}
         placeholder="ニックネーム"
       />
-      <button disabled={sending} className="w-full py-2 bg-amber-500 mt-4">
+      <button disabled={sending} className="w-full py-2 bg-green-500 mt-4">
         参加
       </button>
     </form>
