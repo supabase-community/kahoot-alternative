@@ -314,21 +314,26 @@ function Lobby({ players }: { players: Player[] }) {
   }
 
   return (
-    <div>
-      <div className="flex justify-start flex-wrap pb-4">
-        {players.map((player) => (
-          <div className="text-xl m-2 p-2 bg-green-500" key={player.id}>
-            {player.nickname}
-          </div>
-        ))}
-      </div>
+    <div className="flex justify-between">
+      <div className="w-1/2">
+        <div className="flex justify-start flex-wrap pb-4">
+          {players.map((player) => (
+            <div className="text-xl m-2 p-2 bg-green-500" key={player.id}>
+              {player.nickname}
+            </div>
+          ))}
+        </div>
 
-      <button
-        className="mx-auto bg-white py-4 px-12 block text-black"
-        onClick={onClickStartGame}
-      >
-        ゲームを始める
-      </button>
+        <button
+          className="mx-auto bg-white py-4 px-12 block text-black"
+          onClick={onClickStartGame}
+        >
+          ゲームを始める
+        </button>
+      </div>
+      <div className="w-1/2">
+        <img src="/qr.png" alt="QR code" />
+      </div>
     </div>
   )
 }
