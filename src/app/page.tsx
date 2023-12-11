@@ -2,54 +2,15 @@
 
 import React, { FormEvent, useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { setRequestMeta } from 'next/dist/server/request-meta'
-
-export const supabase = createClient(
-  'https://aofiufmhphqtsjpatqdy.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvZml1Zm1ocGhxdHNqcGF0cWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDIyNjY4MjIsImV4cCI6MjAxNzg0MjgyMn0.AE6Aq1h7mxmiWI0q-qc0NEcw42MNz0fJDWPWbckaiz0'
-)
-
-export type Player = {
-  nickname: string
-  id: string
-}
-
-export type Problem = {
-  id: string
-  body: string
-  order: number
-  image_url: string
-  choices: Choice[]
-}
-
-export type Choice = {
-  id: string
-  problem_id: string
-  is_correct: boolean
-  body: string
-}
-
-export type Answer = {
-  id: string
-  problem_id: string
-  player_id: string
-  choice_id: string
-}
-
-export type Session = {
-  id: string
-  current_problem_sequence: number
-  is_done: boolean
-}
-
-export enum Screens {
-  register,
-  lobby,
-  quiz,
-  results,
-}
-
-export const sessionId = 'dc84bced-bb8b-4bff-b7b1-9eb21cae92ca'
+import {
+  Choice,
+  Player,
+  Problem,
+  Screens,
+  Session,
+  sessionId,
+  supabase,
+} from '@/misk'
 
 export default function Home() {
   const onRegisterCompleted = (player: Player) => {
@@ -130,18 +91,18 @@ export default function Home() {
             playerId={player!.id}
           ></Quiz>
         )}
-        {currentScreen == Screens.results && <Results></Results>}
+        {currentScreen == Screens.results && (
+          <Results player={player!}></Results>
+        )}
       </div>
     </main>
   )
 }
 
-function Results() {
+function Results({ player }: { player: Player }) {
   return (
     <div>
-      <h2 className="text-xl pb-4">
-        お疲れ様でした！登壇者の画面を見てください
-      </h2>
+      <h2 className="text-xl pb-4">{player.nickname}さんお疲れ様でした！</h2>
       <p>
         クイズは楽しんでいただけましたか？ぜひ本日のイベント最後まで楽しんでいってくださいね！
       </p>
@@ -166,6 +127,7 @@ function Quiz({
 
   useEffect(() => {
     setHasAnswered(false)
+    setHasShownChoices(false)
 
     setTimeout(() => {
       setHasShownChoices(true)

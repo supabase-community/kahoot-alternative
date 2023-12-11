@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import {
   Answer,
   Choice,
@@ -9,7 +8,8 @@ import {
   Session,
   sessionId,
   supabase,
-} from '../page'
+} from '@/misk'
+import { useEffect, useState } from 'react'
 
 enum AdminScreens {
   lobby,
@@ -26,27 +26,7 @@ export default function Home() {
 
   const [problems, setProblems] = useState<Problem[]>()
 
-  const setPlayerListener = async () => {
-    supabase
-      .channel('session')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'players',
-        },
-        (payload) => {
-          setPlayers((currentPlayers) => {
-            return [...currentPlayers, payload.new as Player]
-          })
-        }
-      )
-      .subscribe()
-  }
-
   useEffect(() => {
-    setPlayerListener()
     getProblems()
     setSessionListner()
   }, [])
@@ -75,6 +55,19 @@ export default function Home() {
   const setSessionListner = () => {
     supabase
       .channel('session')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'players',
+        },
+        (payload) => {
+          setPlayers((currentPlayers) => {
+            return [...currentPlayers, payload.new as Player]
+          })
+        }
+      )
       .on(
         'postgres_changes',
         {
@@ -161,6 +154,13 @@ function Results({
     })
 
     const orderedPlayers = Object.keys(resultMap)
+      .filter((key) => {
+        const targetPlayer = players.find((player) => {
+          player.id = key
+        })
+        if (!targetPlayer) return false
+        return true
+      })
       .map((key) => {
         const targetPlayer = players.find((player) => {
           player.id = key
@@ -170,6 +170,7 @@ function Results({
       .sort((a, b) => a.correctCount - b.correctCount)
 
     setOrderedPlayers(orderedPlayers)
+    console.log(orderedPlayers)
   }
 
   useEffect(() => {
@@ -178,6 +179,7 @@ function Results({
 
   return (
     <div>
+      <h1 className="text-xl pb-4">結果発表！</h1>
       {finalOrderedPlayers.map((player) => (
         <div key={player.id}>{player.player?.nickname}</div>
       ))}
@@ -219,7 +221,7 @@ function Quiz({
 
     setTimeout(() => {
       setHasShownChoices(true)
-    }, 5000)
+    }, 5)
   }, [problem.id])
 
   return (
