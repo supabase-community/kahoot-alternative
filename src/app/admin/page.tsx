@@ -131,7 +131,7 @@ function Results({
       return alert(error.message)
     }
     const answers = data as Answer[]
-    console.log({ answers })
+
     const correctAnswers = answers.filter((answer) => {
       const targetProblem = problems.find((problem) => {
         return problem.id == answer.problem_id
@@ -145,7 +145,6 @@ function Results({
       if (!targetChoice) return false
       return targetChoice.is_correct
     })
-    console.log({ correctAnswers })
 
     const resultMap: { [key: string]: number } = {}
     correctAnswers.forEach((answer) => {
@@ -154,7 +153,6 @@ function Results({
       }
       resultMap[answer.player_id]++
     })
-    console.log({ resultMap })
 
     // const orderedPlayers = Object.keys(resultMap)
     const filteredPlayers = Object.keys(resultMap).filter((key) => {
@@ -164,8 +162,6 @@ function Results({
       return true
     })
 
-    console.log({ filteredPlayers })
-
     const orderedPlayers = filteredPlayers
       .map((key) => {
         const targetPlayer = players.find((player) => player.id == key)
@@ -174,7 +170,6 @@ function Results({
       .sort((a, b) => a.correctCount - b.correctCount)
 
     setOrderedPlayers(orderedPlayers)
-    console.log({ orderedPlayers })
   }
 
   useEffect(() => {
@@ -184,8 +179,17 @@ function Results({
   return (
     <div>
       <h1 className="text-xl pb-4">結果発表！</h1>
-      {finalOrderedPlayers.map((player) => (
-        <div key={player.id}>{player.player?.nickname}</div>
+      {finalOrderedPlayers.map((player, index) => (
+        <div
+          key={player.id}
+          className="flex justify-between border-b-white border-b-2 py-2"
+        >
+          <div>{player.player?.nickname}</div>
+          <div className="flex-grow"></div>
+          <div>
+            {player.correctCount}/{problems.length}
+          </div>
+        </div>
       ))}
     </div>
   )

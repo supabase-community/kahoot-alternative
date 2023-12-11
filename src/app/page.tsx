@@ -131,7 +131,7 @@ function Quiz({
 
     setTimeout(() => {
       setHasShownChoices(true)
-    }, 5000)
+    }, 1500)
   }, [problem.id])
 
   const answer = async (choiceId: string) => {
