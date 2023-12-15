@@ -1,7 +1,7 @@
 'use client'
 
 import React, { FormEvent, useEffect, useState } from 'react'
-import { Choice, Player, Problem, Game, gameId, supabase } from '@/misk'
+import { Choice, Player, Question, Game, gameId, supabase } from '@/misk'
 
 enum Screens {
   register,
@@ -21,7 +21,7 @@ export default function Home() {
 
   const [currentScreen, setCurrentScreen] = useState(Screens.register)
 
-  const [questions, setQuestions] = useState<Problem[]>()
+  const [questions, setQuestions] = useState<Question[]>()
 
   const getQuestions = async () => {
     const { data, error } = await supabase
@@ -34,7 +34,7 @@ export default function Home() {
     }
     setQuestions(data)
 
-    const choiceCount = data.map((rows: Problem) => rows.choices.length)
+    const choiceCount = data.map((rows: Question) => rows.choices.length)
 
     const correctCount = data.map(
       (rows) =>
@@ -63,7 +63,7 @@ export default function Home() {
             setCurrentScreen(Screens.results)
           } else {
             setCurrentScreen(Screens.quiz)
-            setCurrentQuestionSequence(game.current_problem_sequence)
+            setCurrentQuestionSequence(game.current_question_sequence)
           }
         }
       )
@@ -84,8 +84,8 @@ export default function Home() {
         {currentScreen == Screens.lobby && <Lobby player={player!}></Lobby>}
         {currentScreen == Screens.quiz && (
           <Quiz
-            problem={questions![currentQuestionSequence]}
-            problemCount={questions!.length}
+            question={questions![currentQuestionSequence]}
+            questionCount={questions!.length}
             playerId={player!.id}
           ></Quiz>
         )}
@@ -107,12 +107,12 @@ function Results({ player }: { player: Player }) {
 }
 
 function Quiz({
-  problem,
-  problemCount,
+  question: question,
+  questionCount: questionCount,
   playerId,
 }: {
-  problem: Problem
-  problemCount: number
+  question: Question
+  questionCount: number
   playerId: string
 }) {
   const [hasAnswered, setHasAnswered] = useState(false)
@@ -128,33 +128,32 @@ function Quiz({
     setTimeout(() => {
       setHasShownChoices(true)
     }, 1500)
-  }, [problem.id])
+  }, [question.id])
 
   const answer = async (choiceId: string) => {
     setHasAnswered(true)
     setSelectedChoiceId(choiceId)
     const { data, error } = await supabase.from('answers').insert({
       player_id: playerId,
-      problem_id: problem.id,
       choice_id: choiceId,
-      answer_time: 100,
+      time: 100,
     })
     if (error) {
       setHasAnswered(false)
-      alert(error)
+      alert(error.message)
     }
   }
 
   return (
     <div>
       <div className="absolute left-4 top-4">
-        {problem.order + 1}/{problemCount}
+        {question.order + 1}/{questionCount}
       </div>
 
-      <h1 className="pb-4 text-xl">{problem.body}</h1>
+      <h1 className="pb-4 text-xl">{question.body}</h1>
       {hasShownChoices && (
         <div className="flex justify-between flex-wrap">
-          {problem.choices.map((choice) => (
+          {question.choices.map((choice) => (
             <div key={choice.id} className="w-1/2 p-1">
               <button
                 disabled={hasAnswered}
@@ -231,7 +230,7 @@ function Register({
     }
     const { data: player, error } = await supabase
       .from('players')
-      .insert({ nickname })
+      .insert({ nickname, game_id: gameId })
       .select()
       .single()
 

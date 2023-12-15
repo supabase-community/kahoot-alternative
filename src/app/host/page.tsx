@@ -1,6 +1,14 @@
 'use client'
 
-import { Answer, Choice, Player, Problem, Game, gameId, supabase } from '@/misk'
+import {
+  Answer,
+  Choice,
+  Player,
+  Question,
+  Game,
+  gameId,
+  supabase,
+} from '@/misk'
 import { useEffect, useState } from 'react'
 
 enum AdminScreens {
@@ -16,7 +24,7 @@ export default function Home() {
 
   const [players, setPlayers] = useState<Player[]>([])
 
-  const [questions, setQuestions] = useState<Problem[]>()
+  const [questions, setQuestions] = useState<Question[]>()
 
   useEffect(() => {
     getQuestions()
@@ -34,7 +42,7 @@ export default function Home() {
     }
     setQuestions(data)
 
-    const choiceCount = data.map((rows: Problem) => rows.choices.length)
+    const choiceCount = data.map((rows: Question) => rows.choices.length)
 
     const correctCount = data.map(
       (rows) =>
@@ -71,7 +79,7 @@ export default function Home() {
         (payload) => {
           // start the quiz game
           const game = payload.new as Game
-          setCurrentQuestionSequence(game.current_problem_sequence)
+          setCurrentQuestionSequence(game.current_question_sequence)
           if (game.is_done) {
             setCurrentScreen(AdminScreens.results)
           } else {
@@ -90,8 +98,8 @@ export default function Home() {
         )}
         {currentScreen == AdminScreens.quiz && (
           <Quiz
-            problem={questions![currentQuestionSequence]}
-            problemCount={questions!.length}
+            question={questions![currentQuestionSequence]}
+            questionCount={questions!.length}
           ></Quiz>
         )}
         {currentScreen == AdminScreens.results && (
@@ -107,7 +115,7 @@ function Results({
   questions: questions,
 }: {
   players: Player[]
-  questions: Problem[]
+  questions: Question[]
 }) {
   const [finalOrderedPlayers, setOrderedPlayers] = useState<
     {
@@ -125,12 +133,14 @@ function Results({
     const answers = data as Answer[]
 
     const correctAnswers = answers.filter((answer) => {
-      const targetProblem = questions.find((problem) => {
-        return problem.id == answer.problem_id
+      const targetQuestion = questions.find((question) => {
+        return question.choices
+          .map((choice) => choice.id)
+          .includes(answer.choice_id)
       })
-      if (!targetProblem) return false
+      if (!targetQuestion) return false
 
-      const targetChoice = targetProblem.choices.find((choice) => {
+      const targetChoice = targetQuestion.choices.find((choice) => {
         return choice.id == answer.choice_id
       })
 
@@ -188,11 +198,11 @@ function Results({
 }
 
 function Quiz({
-  problem,
-  problemCount,
+  question: question,
+  questionCount: questionCount,
 }: {
-  problem: Problem
-  problemCount: number
+  question: Question
+  questionCount: number
 }) {
   const [hasShownAnswer, setHasShownAnswer] = useState(false)
 
@@ -200,10 +210,10 @@ function Quiz({
 
   const getNextQuestion = async () => {
     var updateData
-    if (problemCount == problem.order + 1) {
+    if (questionCount == question.order + 1) {
       updateData = { is_done: true }
     } else {
-      updateData = { current_problem_sequence: problem.order + 1 }
+      updateData = { current_question_sequence: question.order + 1 }
     }
 
     const { data, error } = await supabase
@@ -222,18 +232,18 @@ function Quiz({
     setTimeout(() => {
       setHasShownChoices(true)
     }, 5)
-  }, [problem.id])
+  }, [question.id])
 
   return (
     <div>
       <div className="absolute left-4 top-4">
-        {problem.order + 1}/{problemCount}
+        {question.order + 1}/{questionCount}
       </div>
 
-      <h1 className="pb-4 text-xl">{problem.body}</h1>
+      <h1 className="pb-4 text-xl">{question.body}</h1>
       {hasShownChoices && (
         <div className="flex justify-between flex-wrap">
-          {problem.choices.map((choice) => (
+          {question.choices.map((choice) => (
             <div key={choice.id} className="w-1/2 p-1">
               <div
                 className={`p-2 w-full text-center 
@@ -298,7 +308,7 @@ function Lobby({ players }: { players: Player[] }) {
   const onClickStartGame = async () => {
     const { data, error } = await supabase
       .from('games')
-      .update({ current_problem_sequence: 0 })
+      .update({ has_started: true })
       .eq('id', gameId)
     if (error) {
       return alert(error.message)

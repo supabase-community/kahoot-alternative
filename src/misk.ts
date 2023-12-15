@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
 export const supabase = createClient(
-  'https://aofiufmhphqtsjpatqdy.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvZml1Zm1ocGhxdHNqcGF0cWR5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDIyNjY4MjIsImV4cCI6MjAxNzg0MjgyMn0.AE6Aq1h7mxmiWI0q-qc0NEcw42MNz0fJDWPWbckaiz0'
+  'http://localhost:54321',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
 )
 
 export type Player = {
@@ -10,7 +10,7 @@ export type Player = {
   nickname: string
 }
 
-export type Problem = {
+export type Question = {
   id: string
   body: string
   order: number
@@ -20,22 +20,24 @@ export type Problem = {
 
 export type Choice = {
   id: string
-  problem_id: string
+  question_id: string
   is_correct: boolean
   body: string
 }
 
 export type Answer = {
   id: string
-  problem_id: string
   player_id: string
   choice_id: string
+  /** Time it took to answer the question */
+  time: number
 }
 
 export type Game = {
   id: string
-  current_problem_sequence: number
+  current_question_sequence: number
+  has_started: boolean
   is_done: boolean
 }
 
-export const gameId = 'dc84bced-bb8b-4bff-b7b1-9eb21cae92ca'
+export const gameId = 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'
