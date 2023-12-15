@@ -16,23 +16,23 @@ export default function Home() {
 
   const [players, setPlayers] = useState<Player[]>([])
 
-  const [problems, setProblems] = useState<Problem[]>()
+  const [questions, setQuestions] = useState<Problem[]>()
 
   useEffect(() => {
-    getProblems()
+    getQuestions()
     setGameListner()
   }, [])
 
-  const getProblems = async () => {
+  const getQuestions = async () => {
     const { data, error } = await supabase
-      .from('problems')
+      .from('questions')
       .select(`*, choices(*)`)
       .order('order', { ascending: true })
     if (error) {
-      getProblems()
+      getQuestions()
       return
     }
-    setProblems(data)
+    setQuestions(data)
 
     const choiceCount = data.map((rows: Problem) => rows.choices.length)
 
@@ -42,7 +42,7 @@ export default function Home() {
     )
   }
 
-  const [currentProblemSequence, setCurrentProblemSequence] = useState(0)
+  const [currentQuestionSequence, setCurrentQuestionSequence] = useState(0)
 
   const setGameListner = () => {
     supabase
@@ -71,7 +71,7 @@ export default function Home() {
         (payload) => {
           // start the quiz game
           const game = payload.new as Game
-          setCurrentProblemSequence(game.current_problem_sequence)
+          setCurrentQuestionSequence(game.current_problem_sequence)
           if (game.is_done) {
             setCurrentScreen(AdminScreens.results)
           } else {
@@ -90,12 +90,12 @@ export default function Home() {
         )}
         {currentScreen == AdminScreens.quiz && (
           <Quiz
-            problem={problems![currentProblemSequence]}
-            problemCount={problems!.length}
+            problem={questions![currentQuestionSequence]}
+            problemCount={questions!.length}
           ></Quiz>
         )}
         {currentScreen == AdminScreens.results && (
-          <Results players={players!} problems={problems!}></Results>
+          <Results players={players!} questions={questions!}></Results>
         )}
       </div>
     </main>
@@ -104,10 +104,10 @@ export default function Home() {
 
 function Results({
   players,
-  problems,
+  questions: questions,
 }: {
   players: Player[]
-  problems: Problem[]
+  questions: Problem[]
 }) {
   const [finalOrderedPlayers, setOrderedPlayers] = useState<
     {
@@ -125,7 +125,7 @@ function Results({
     const answers = data as Answer[]
 
     const correctAnswers = answers.filter((answer) => {
-      const targetProblem = problems.find((problem) => {
+      const targetProblem = questions.find((problem) => {
         return problem.id == answer.problem_id
       })
       if (!targetProblem) return false
@@ -179,7 +179,7 @@ function Results({
           <div>{player.player?.nickname}</div>
           <div className="flex-grow"></div>
           <div>
-            {player.correctCount}/{problems.length}
+            {player.correctCount}/{questions.length}
           </div>
         </div>
       ))}

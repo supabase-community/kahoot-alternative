@@ -21,18 +21,18 @@ export default function Home() {
 
   const [currentScreen, setCurrentScreen] = useState(Screens.register)
 
-  const [problems, setProblems] = useState<Problem[]>()
+  const [questions, setQuestions] = useState<Problem[]>()
 
-  const getProblems = async () => {
+  const getQuestions = async () => {
     const { data, error } = await supabase
-      .from('problems')
+      .from('questions')
       .select(`*, choices(*)`)
       .order('order', { ascending: true })
     if (error) {
-      getProblems()
+      getQuestions()
       return
     }
-    setProblems(data)
+    setQuestions(data)
 
     const choiceCount = data.map((rows: Problem) => rows.choices.length)
 
@@ -42,7 +42,7 @@ export default function Home() {
     )
   }
 
-  const [currentProblemSequence, setCurrentProblemSequence] = useState(0)
+  const [currentQuestionSequence, setCurrentQuestionSequence] = useState(0)
 
   const setGameListner = () => {
     supabase
@@ -63,7 +63,7 @@ export default function Home() {
             setCurrentScreen(Screens.results)
           } else {
             setCurrentScreen(Screens.quiz)
-            setCurrentProblemSequence(game.current_problem_sequence)
+            setCurrentQuestionSequence(game.current_problem_sequence)
           }
         }
       )
@@ -71,7 +71,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    getProblems()
+    getQuestions()
     setGameListner()
   }, [])
 
@@ -84,8 +84,8 @@ export default function Home() {
         {currentScreen == Screens.lobby && <Lobby player={player!}></Lobby>}
         {currentScreen == Screens.quiz && (
           <Quiz
-            problem={problems![currentProblemSequence]}
-            problemCount={problems!.length}
+            problem={questions![currentQuestionSequence]}
+            problemCount={questions!.length}
             playerId={player!.id}
           ></Quiz>
         )}
