@@ -102,10 +102,8 @@ export default function Home() {
 function Results({ player }: { player: Player }) {
   return (
     <div>
-      <h2 className="text-xl pb-4">{player.nickname}さんお疲れ様でした！</h2>
-      <p>
-        クイズは楽しんでいただけましたか？ぜひ本日のイベント最後まで楽しんでいってくださいね！
-      </p>
+      <h2 className="text-xl pb-4">{player.nickname}！</h2>
+      <p>How was the game? Thanks for playing!</p>
     </div>
   )
 }
@@ -212,9 +210,10 @@ function Quiz({
 function Lobby({ player }: { player: Player }) {
   return (
     <div>
-      <h1 className="text-xl pb-4">ようこそ{player.nickname}さん！</h1>
+      <h1 className="text-xl pb-4">Welcome {player.nickname}！</h1>
       <p>
-        ゲームに参加できました！画面に名前が表示されるはずです！他の皆様が登録されるのをもう少々お待ちください。
+        You have been registered and your nickname should show up on the admin
+        screen. Please sit back and wait until the game master starts the game.
       </p>
     </div>
   )
@@ -241,9 +240,7 @@ function Register({
     if (error) {
       setSending(false)
 
-      return alert(
-        `正常に登録ができませんでした。もう一度お試しください。Error: ${error}`
-      )
+      return alert(error.message)
     }
 
     onRegisterComplete(player)
@@ -258,11 +255,11 @@ function Register({
         className="p-2 w-full border border-black text-black"
         type="text"
         onChange={(val) => setNickname(val.currentTarget.value)}
-        placeholder="ニックネーム"
+        placeholder="Nickname"
         maxLength={20}
       />
       <button disabled={sending} className="w-full py-2 bg-green-500 mt-4">
-        参加
+        Join
       </button>
     </form>
   )

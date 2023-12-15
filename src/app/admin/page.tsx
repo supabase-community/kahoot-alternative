@@ -178,7 +178,7 @@ function Results({
 
   return (
     <div>
-      <h1 className="text-xl pb-4">結果発表！</h1>
+      <h1 className="text-xl pb-4">View Results！</h1>
       {finalOrderedPlayers.map((player, index) => (
         <div
           key={player.id}
@@ -289,12 +289,12 @@ function Quiz({
             className="p-2 bg-white text-black"
             onClick={() => setHasShownAnswer(true)}
           >
-            答えを見る
+            View Answer
           </button>
         )}
         {hasShownAnswer && (
           <button className="p-2 bg-white text-black" onClick={getNextQuestion}>
-            次の問題へ
+            Go to Next Question
           </button>
         )}
       </div>
@@ -328,7 +328,7 @@ function Lobby({ players }: { players: Player[] }) {
           className="mx-auto bg-white py-4 px-12 block text-black"
           onClick={onClickStartGame}
         >
-          ゲームを始める
+          Start Game
         </button>
       </div>
       <div className="w-1/2">
