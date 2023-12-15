@@ -6,8 +6,8 @@ export const supabase = createClient(
 )
 
 export type Player = {
-  nickname: string
   id: string
+  nickname: string
 }
 
 export type Problem = {
@@ -32,17 +32,10 @@ export type Answer = {
   choice_id: string
 }
 
-export type Session = {
+export type Game = {
   id: string
   current_problem_sequence: number
   is_done: boolean
 }
 
-export enum Screens {
-  register,
-  lobby,
-  quiz,
-  results,
-}
-
-export const sessionId = 'dc84bced-bb8b-4bff-b7b1-9eb21cae92ca'
+export const gameId = 'dc84bced-bb8b-4bff-b7b1-9eb21cae92ca'

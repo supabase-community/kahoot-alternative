@@ -1,14 +1,6 @@
 'use client'
 
-import {
-  Answer,
-  Choice,
-  Player,
-  Problem,
-  Session,
-  sessionId,
-  supabase,
-} from '@/misk'
+import { Answer, Choice, Player, Problem, Game, gameId, supabase } from '@/misk'
 import { useEffect, useState } from 'react'
 
 enum AdminScreens {
@@ -28,7 +20,7 @@ export default function Home() {
 
   useEffect(() => {
     getProblems()
-    setSessionListner()
+    setGameListner()
   }, [])
 
   const getProblems = async () => {
@@ -52,9 +44,9 @@ export default function Home() {
 
   const [currentProblemSequence, setCurrentProblemSequence] = useState(0)
 
-  const setSessionListner = () => {
+  const setGameListner = () => {
     supabase
-      .channel('session')
+      .channel('game')
       .on(
         'postgres_changes',
         {
@@ -73,14 +65,14 @@ export default function Home() {
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'sessions',
-          filter: `id=eq.${sessionId}`,
+          table: 'games',
+          filter: `id=eq.${gameId}`,
         },
         (payload) => {
-          // start the quiz session
-          const session = payload.new as Session
-          setCurrentProblemSequence(session.current_problem_sequence)
-          if (session.is_done) {
+          // start the quiz game
+          const game = payload.new as Game
+          setCurrentProblemSequence(game.current_problem_sequence)
+          if (game.is_done) {
             setCurrentScreen(AdminScreens.results)
           } else {
             setCurrentScreen(AdminScreens.quiz)
@@ -215,9 +207,9 @@ function Quiz({
     }
 
     const { data, error } = await supabase
-      .from('sessions')
+      .from('games')
       .update(updateData)
-      .eq('id', sessionId)
+      .eq('id', gameId)
     if (error) {
       return alert(error.message)
     }
@@ -305,9 +297,9 @@ function Quiz({
 function Lobby({ players }: { players: Player[] }) {
   const onClickStartGame = async () => {
     const { data, error } = await supabase
-      .from('sessions')
+      .from('games')
       .update({ current_problem_sequence: 0 })
-      .eq('id', sessionId)
+      .eq('id', gameId)
     if (error) {
       return alert(error.message)
     }

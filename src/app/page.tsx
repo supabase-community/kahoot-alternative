@@ -1,16 +1,14 @@
 'use client'
 
 import React, { FormEvent, useEffect, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
-import {
-  Choice,
-  Player,
-  Problem,
-  Screens,
-  Session,
-  sessionId,
-  supabase,
-} from '@/misk'
+import { Choice, Player, Problem, Game, gameId, supabase } from '@/misk'
+
+enum Screens {
+  register,
+  lobby,
+  quiz,
+  results,
+}
 
 export default function Home() {
   const onRegisterCompleted = (player: Player) => {
@@ -46,26 +44,26 @@ export default function Home() {
 
   const [currentProblemSequence, setCurrentProblemSequence] = useState(0)
 
-  const setSessionListner = () => {
+  const setGameListner = () => {
     supabase
-      .channel('session')
+      .channel('game')
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'sessions',
-          filter: `id=eq.${sessionId}`,
+          table: 'games',
+          filter: `id=eq.${gameId}`,
         },
         (payload) => {
-          // start the quiz session
-          const session = payload.new as Session
+          // start the quiz game
+          const game = payload.new as Game
 
-          if (session.is_done) {
+          if (game.is_done) {
             setCurrentScreen(Screens.results)
           } else {
             setCurrentScreen(Screens.quiz)
-            setCurrentProblemSequence(session.current_problem_sequence)
+            setCurrentProblemSequence(game.current_problem_sequence)
           }
         }
       )
@@ -74,7 +72,7 @@ export default function Home() {
 
   useEffect(() => {
     getProblems()
-    setSessionListner()
+    setGameListner()
   }, [])
 
   return (
