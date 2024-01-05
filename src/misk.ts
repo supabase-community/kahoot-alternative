@@ -1,43 +1,21 @@
 import { createClient } from '@supabase/supabase-js'
+import { Database } from './types/supabase'
 
-export const supabase = createClient(
-  'http://localhost:54321',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0'
+export const supabase = createClient<Database>(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
 )
 
-export type Player = {
-  id: string
-  nickname: string
-}
+export type Player = Database['public']['Tables']['players']['Row']
 
-export type Question = {
-  id: string
-  body: string
-  order: number
-  image_url: string
+export type Choice = Database['public']['Tables']['choices']['Row']
+
+export type Question = Database['public']['Tables']['questions']['Row'] & {
   choices: Choice[]
 }
 
-export type Choice = {
-  id: string
-  question_id: string
-  is_correct: boolean
-  body: string
-}
+export type Answer = Database['public']['Tables']['answers']['Row']
 
-export type Answer = {
-  id: string
-  player_id: string
-  choice_id: string
-  /** Time it took to answer the question */
-  time: number
-}
-
-export type Game = {
-  id: string
-  current_question_sequence: number
-  has_started: boolean
-  is_done: boolean
-}
+export type Game = Database['public']['Tables']['games']['Row']
 
 export const gameId = 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'
