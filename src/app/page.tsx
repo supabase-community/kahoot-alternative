@@ -1,7 +1,7 @@
 'use client'
 
 import React, { FormEvent, useEffect, useState } from 'react'
-import { Choice, Player, Question, Game, gameId, supabase } from '@/misk'
+import { Choice, Player, Question, Game, gameId, supabase } from '@/types/types'
 
 enum Screens {
   register,
@@ -133,7 +133,7 @@ function Quiz({
   const answer = async (choiceId: string) => {
     setHasAnswered(true)
     setSelectedChoiceId(choiceId)
-    const { data, error } = await supabase.from('answers').insert({
+    const { error } = await supabase.from('answers').insert({
       player_id: playerId,
       choice_id: choiceId,
       time: 100,
