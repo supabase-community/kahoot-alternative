@@ -18,9 +18,9 @@ enum AdminScreens {
 }
 
 export default function Home({
-  params: { gameId },
+  params: { id: gameId },
 }: {
-  params: { gameId: string }
+  params: { id: string }
 }) {
   const [currentScreen, setCurrentScreen] = useState<AdminScreens>(
     AdminScreens.lobby
