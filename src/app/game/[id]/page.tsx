@@ -1,8 +1,8 @@
 'use client'
 
 import React, { FormEvent, useEffect, useState } from 'react'
-import { Choice, Player, Question, Game, gameId, supabase } from '@/types/types'
 import { RealtimeChannel } from '@supabase/supabase-js'
+import { Choice, Game, Player, Question, supabase } from '@/types/types'
 
 enum Screens {
   register,
@@ -19,6 +19,7 @@ export default function Home({
   const onRegisterCompleted = (player: Player) => {
     setPlayer(player)
     setCurrentScreen(Screens.lobby)
+    getGame()
   }
 
   const [player, setPlayer] = useState<Player | null>()
@@ -47,7 +48,25 @@ export default function Home({
   }
 
   const [currentQuestionSequence, setCurrentQuestionSequence] = useState(0)
+  const [isAnswerRevealed, setIsAnswerRevealed] = useState(false)
 
+  const getGame = async () => {
+    const { data: game } = await supabase
+      .from('games')
+      .select()
+      .eq('id', gameId)
+      .single()
+    if (!game) return
+    if (!game.started_at) {
+      setCurrentScreen(Screens.lobby)
+    } else if (game.phase == 'results') {
+      setCurrentScreen(Screens.results)
+    } else {
+      setCurrentScreen(Screens.quiz)
+      setCurrentQuestionSequence(game.current_question_sequence)
+      setIsAnswerRevealed(game.is_answer_revealed)
+    }
+  }
   const setGameListner = (): RealtimeChannel => {
     return supabase
       .channel('game')
@@ -63,11 +82,13 @@ export default function Home({
           // start the quiz game
           const game = payload.new as Game
 
-          if (game.is_done) {
+          if (game.phase == 'result') {
             setCurrentScreen(Screens.results)
           } else {
             setCurrentScreen(Screens.quiz)
             setCurrentQuestionSequence(game.current_question_sequence)
+            setIsAnswerRevealed(game.is_answer_revealed)
+            console.log(game.is_answer_revealed)
           }
         }
       )
@@ -86,7 +107,10 @@ export default function Home({
     <main className="flex min-h-screen flex-col items-center justify-between p-12">
       <div className="max-w-md m-auto p-8 bg-black  text-white">
         {currentScreen == Screens.register && (
-          <Register onRegisterCompleted={onRegisterCompleted}></Register>
+          <Register
+            onRegisterCompleted={onRegisterCompleted}
+            gameId={gameId}
+          ></Register>
         )}
         {currentScreen == Screens.lobby && <Lobby player={player!}></Lobby>}
         {currentScreen == Screens.quiz && (
@@ -94,6 +118,7 @@ export default function Home({
             question={questions![currentQuestionSequence]}
             questionCount={questions!.length}
             playerId={player!.id}
+            isAnswerRevealed={isAnswerRevealed}
           ></Quiz>
         )}
         {currentScreen == Screens.results && (
@@ -117,19 +142,19 @@ function Quiz({
   question: question,
   questionCount: questionCount,
   playerId,
+  isAnswerRevealed,
 }: {
   question: Question
   questionCount: number
   playerId: string
+  isAnswerRevealed: boolean
 }) {
-  const [hasAnswered, setHasAnswered] = useState(false)
-
-  const [selectedChoiceId, setSelectedChoiceId] = useState<string>()
+  const [chosenChoiceId, setChosenChoiceId] = useState<string | null>(null)
 
   const [hasShownChoices, setHasShownChoices] = useState(false)
 
   useEffect(() => {
-    setHasAnswered(false)
+    setChosenChoiceId(null)
     setHasShownChoices(false)
 
     setTimeout(() => {
@@ -138,16 +163,17 @@ function Quiz({
   }, [question.id])
 
   const answer = async (choiceId: string) => {
-    setHasAnswered(true)
-    setSelectedChoiceId(choiceId)
+    setChosenChoiceId(choiceId)
+
     const { error } = await supabase.from('answers').insert({
       player_id: playerId,
       choice_id: choiceId,
       time: 100,
     })
     if (error) {
-      setHasAnswered(false)
+      setChosenChoiceId(null)
       alert(error.message)
+      console.log({ playerId, choiceId })
     }
   }
 
@@ -163,20 +189,22 @@ function Quiz({
           {question.choices.map((choice) => (
             <div key={choice.id} className="w-1/2 p-1">
               <button
-                disabled={hasAnswered}
+                disabled={chosenChoiceId !== null}
                 onClick={() => answer(choice.id)}
-                className={`p-2 w-full text-center 
-              ${
-                hasAnswered
-                  ? selectedChoiceId == choice.id
+                className={`p-2 w-full text-center border-2
+                ${
+                  chosenChoiceId === choice.id
+                    ? 'border-red-500'
+                    : 'border-transparent'
+                }
+                ${
+                  isAnswerRevealed
                     ? choice.is_correct
                       ? 'bg-green-500'
-                      : 'bg-red-500'
-                    : choice.is_correct
-                    ? 'bg-green-500'
-                    : 'bg-gray-400'
-                  : 'bg-green-500'
-              }`}
+                      : 'bg-gray-400'
+                    : 'bg-green-500'
+                }
+             `}
               >
                 {choice.body}
               </button>
@@ -225,8 +253,10 @@ function Lobby({ player }: { player: Player }) {
 
 function Register({
   onRegisterCompleted: onRegisterComplete,
+  gameId,
 }: {
   onRegisterCompleted: (player: Player) => void
+  gameId: string
 }) {
   const onFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()

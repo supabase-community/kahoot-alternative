@@ -8,7 +8,7 @@ import {
   Game,
   gameId,
   supabase,
-} from '@/types/types'
+} from '@/types/supabase'
 import { useEffect, useState } from 'react'
 
 enum AdminScreens {
@@ -57,7 +57,10 @@ export default function Home({
 
   const [currentQuestionSequence, setCurrentQuestionSequence] = useState(0)
 
-  const setGameListner = () => {
+  const setGameListner = async () => {
+    const { data } = await supabase.from('players').select().order('created_at')
+    if (data) setPlayers(data)
+
     supabase
       .channel('game')
       .on(
@@ -210,7 +213,7 @@ function Quiz({
   question: Question
   questionCount: number
 }) {
-  const [hasShownAnswer, setHasShownAnswer] = useState(false)
+  const [isAnswerRevealed, setIsAnswerRevealed] = useState(false)
 
   const [hasShownChoices, setHasShownChoices] = useState(false)
 
@@ -219,7 +222,10 @@ function Quiz({
     if (questionCount == question.order + 1) {
       updateData = { is_done: true }
     } else {
-      updateData = { current_question_sequence: question.order + 1 }
+      updateData = {
+        current_question_sequence: question.order + 1,
+        is_answer_revealed: false,
+      }
     }
 
     const { data, error } = await supabase
@@ -232,7 +238,6 @@ function Quiz({
   }
 
   useEffect(() => {
-    setHasShownAnswer(false)
     setHasShownChoices(false)
 
     setTimeout(() => {
@@ -252,9 +257,9 @@ function Quiz({
           {question.choices.map((choice) => (
             <div key={choice.id} className="w-1/2 p-1">
               <div
-                className={`p-2 w-full text-center 
+                className={`p-2 w-full text-center
               ${
-                hasShownAnswer
+                isAnswerRevealed
                   ? choice.is_correct
                     ? 'bg-green-500'
                     : 'bg-gray-400'
@@ -292,15 +297,21 @@ function Quiz({
       )}
       <div className="flex justify-between pt-4">
         <div></div>
-        {!hasShownAnswer && (
+        {!isAnswerRevealed && (
           <button
             className="p-2 bg-white text-black"
-            onClick={() => setHasShownAnswer(true)}
+            onClick={async () => {
+              setIsAnswerRevealed(true)
+              await supabase
+                .from('games')
+                .update({ is_answer_revealed: true })
+                .eq('id', gameId)
+            }}
           >
             View Answer
           </button>
         )}
-        {hasShownAnswer && (
+        {isAnswerRevealed && (
           <button className="p-2 bg-white text-black" onClick={getNextQuestion}>
             Go to Next Question
           </button>
