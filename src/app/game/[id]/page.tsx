@@ -2,7 +2,7 @@
 
 import React, { FormEvent, useEffect, useState } from 'react'
 import { RealtimeChannel } from '@supabase/supabase-js'
-import { Choice, Game, Player, Question, supabase } from '@/types/types'
+import { Choice, Game, Participant, Question, supabase } from '@/types/types'
 
 enum Screens {
   register,
@@ -16,13 +16,13 @@ export default function Home({
 }: {
   params: { id: string }
 }) {
-  const onRegisterCompleted = (player: Player) => {
+  const onRegisterCompleted = (player: Participant) => {
     setPlayer(player)
     setCurrentScreen(Screens.lobby)
     getGame()
   }
 
-  const [player, setPlayer] = useState<Player | null>()
+  const [player, setPlayer] = useState<Participant | null>()
 
   const [currentScreen, setCurrentScreen] = useState(Screens.register)
 
@@ -57,7 +57,7 @@ export default function Home({
       .eq('id', gameId)
       .single()
     if (!game) return
-    if (!game.started_at) {
+    if (game.phase === 'lobby') {
       setCurrentScreen(Screens.lobby)
     } else if (game.phase == 'results') {
       setCurrentScreen(Screens.results)
@@ -129,7 +129,7 @@ export default function Home({
   )
 }
 
-function Results({ player }: { player: Player }) {
+function Results({ player }: { player: Participant }) {
   return (
     <div>
       <h2 className="text-xl pb-4">{player.nickname}！</h2>
@@ -166,9 +166,9 @@ function Quiz({
     setChosenChoiceId(choiceId)
 
     const { error } = await supabase.from('answers').insert({
-      player_id: playerId,
-      choice_id: choiceId,
-      time: 100,
+      participant_id: playerId,
+      question_id: question.id,
+      score: 100,
     })
     if (error) {
       setChosenChoiceId(null)
@@ -239,7 +239,7 @@ function Quiz({
   )
 }
 
-function Lobby({ player }: { player: Player }) {
+function Lobby({ player }: { player: Participant }) {
   return (
     <div>
       <h1 className="text-xl pb-4">Welcome {player.nickname}！</h1>
@@ -255,7 +255,7 @@ function Register({
   onRegisterCompleted: onRegisterComplete,
   gameId,
 }: {
-  onRegisterCompleted: (player: Player) => void
+  onRegisterCompleted: (player: Participant) => void
   gameId: string
 }) {
   const onFormSubmit = async (e: FormEvent<HTMLFormElement>) => {

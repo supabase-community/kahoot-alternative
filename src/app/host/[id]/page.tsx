@@ -3,12 +3,11 @@
 import {
   Answer,
   Choice,
-  Player,
-  Question,
   Game,
-  gameId,
+  Participant,
+  Question,
   supabase,
-} from '@/types/supabase'
+} from '@/types/types'
 import { useEffect, useState } from 'react'
 
 enum AdminScreens {
@@ -26,7 +25,7 @@ export default function Home({
     AdminScreens.lobby
   )
 
-  const [players, setPlayers] = useState<Player[]>([])
+  const [players, setPlayers] = useState<Participant[]>([])
 
   const [questions, setQuestions] = useState<Question[]>()
 
@@ -73,7 +72,7 @@ export default function Home({
         },
         (payload) => {
           setPlayers((currentPlayers) => {
-            return [...currentPlayers, payload.new as Player]
+            return [...currentPlayers, payload.new as Participant]
           })
         }
       )
@@ -89,7 +88,7 @@ export default function Home({
           // start the quiz game
           const game = payload.new as Game
           setCurrentQuestionSequence(game.current_question_sequence)
-          if (game.is_done) {
+          if (game.phase === 'results') {
             setCurrentScreen(AdminScreens.results)
           } else {
             setCurrentScreen(AdminScreens.quiz)
@@ -103,16 +102,21 @@ export default function Home({
     <main className="flex min-h-screen flex-col items-center justify-between p-12">
       <div className="m-auto p-8 bg-black  text-white">
         {currentScreen == AdminScreens.lobby && (
-          <Lobby players={players}></Lobby>
+          <Lobby players={players} gameId={gameId}></Lobby>
         )}
         {currentScreen == AdminScreens.quiz && (
           <Quiz
             question={questions![currentQuestionSequence]}
             questionCount={questions!.length}
+            gameId={gameId}
           ></Quiz>
         )}
         {currentScreen == AdminScreens.results && (
-          <Results players={players!} questions={questions!}></Results>
+          <Results
+            players={players!}
+            questions={questions!}
+            gameId={gameId}
+          ></Results>
         )}
       </div>
     </main>
@@ -122,65 +126,31 @@ export default function Home({
 function Results({
   players,
   questions: questions,
+  gameId,
 }: {
-  players: Player[]
+  players: Participant[]
   questions: Question[]
+  gameId: string
 }) {
   const [finalOrderedPlayers, setOrderedPlayers] = useState<
     {
       id: string
       correctCount: number
-      player: Player
+      player: Participant
     }[]
   >([])
 
   const getResults = async () => {
-    const { data, error } = await supabase.from('answers').select()
+    const { data, error } = await supabase
+      .from('answers')
+      .select()
+      .eq('game_id', gameId)
     if (error) {
       return alert(error.message)
     }
     const answers = data as Answer[]
 
-    const correctAnswers = answers.filter((answer) => {
-      const targetQuestion = questions.find((question) => {
-        return question.choices
-          .map((choice) => choice.id)
-          .includes(answer.choice_id)
-      })
-      if (!targetQuestion) return false
-
-      const targetChoice = targetQuestion.choices.find((choice) => {
-        return choice.id == answer.choice_id
-      })
-
-      if (!targetChoice) return false
-      return targetChoice.is_correct
-    })
-
-    const resultMap: { [key: string]: number } = {}
-    correctAnswers.forEach((answer) => {
-      if (!resultMap[answer.player_id]) {
-        resultMap[answer.player_id] = 0
-      }
-      resultMap[answer.player_id]++
-    })
-
-    // const orderedPlayers = Object.keys(resultMap)
-    const filteredPlayers = Object.keys(resultMap).filter((key) => {
-      console.log({ players })
-      const targetPlayer = players.find((player) => player.id == key)
-      if (!targetPlayer) return false
-      return true
-    })
-
-    const orderedPlayers = filteredPlayers
-      .map((key) => {
-        const targetPlayer = players.find((player) => player.id == key)
-        return { id: key, correctCount: resultMap[key], player: targetPlayer! }
-      })
-      .sort((a, b) => a.correctCount - b.correctCount)
-
-    setOrderedPlayers(orderedPlayers)
+    // setOrderedPlayers(orderedPlayers)
   }
 
   useEffect(() => {
@@ -209,9 +179,11 @@ function Results({
 function Quiz({
   question: question,
   questionCount: questionCount,
+  gameId,
 }: {
   question: Question
   questionCount: number
+  gameId: string
 }) {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false)
 
@@ -321,11 +293,17 @@ function Quiz({
   )
 }
 
-function Lobby({ players }: { players: Player[] }) {
+function Lobby({
+  players,
+  gameId,
+}: {
+  players: Participant[]
+  gameId: string
+}) {
   const onClickStartGame = async () => {
     const { data, error } = await supabase
       .from('games')
-      .update({ has_started: true })
+      .update({ has_started: true } as Partial<Game>) // Add type assertion to include 'has_started' property
       .eq('id', gameId)
     if (error) {
       return alert(error.message)

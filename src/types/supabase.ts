@@ -11,39 +11,39 @@ export type Database = {
     Tables: {
       answers: {
         Row: {
-          choice_id: string
           created_at: string
           id: string
-          player_id: string
-          time: number
+          participant_id: string
+          question_id: string
+          score: number
         }
         Insert: {
-          choice_id: string
           created_at?: string
           id?: string
-          player_id: string
-          time: number
+          participant_id: string
+          question_id: string
+          score: number
         }
         Update: {
-          choice_id?: string
           created_at?: string
           id?: string
-          player_id?: string
-          time?: number
+          participant_id?: string
+          question_id?: string
+          score?: number
         }
         Relationships: [
           {
-            foreignKeyName: "answers_choice_id_fkey"
-            columns: ["choice_id"]
+            foreignKeyName: "answers_participant_id_fkey"
+            columns: ["participant_id"]
             isOneToOne: false
-            referencedRelation: "choices"
+            referencedRelation: "participants"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "answers_player_id_fkey"
-            columns: ["player_id"]
+            foreignKeyName: "answers_question_id_fkey"
+            columns: ["question_id"]
             isOneToOne: false
-            referencedRelation: "players"
+            referencedRelation: "questions"
             referencedColumns: ["id"]
           },
         ]
@@ -87,7 +87,7 @@ export type Database = {
           id: string
           is_answer_revealed: boolean
           phase: string
-          started_at: string | null
+          quiz_set_id: string
         }
         Insert: {
           created_at?: string
@@ -95,7 +95,7 @@ export type Database = {
           id?: string
           is_answer_revealed?: boolean
           phase?: string
-          started_at?: string | null
+          quiz_set_id: string
         }
         Update: {
           created_at?: string
@@ -103,35 +103,53 @@ export type Database = {
           id?: string
           is_answer_revealed?: boolean
           phase?: string
-          started_at?: string | null
+          quiz_set_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "games_quiz_set_id_fkey"
+            columns: ["quiz_set_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_sets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      players: {
+      participants: {
         Row: {
           created_at: string
           game_id: string
           id: string
           nickname: string
+          user_id: string
         }
         Insert: {
           created_at?: string
           game_id: string
           id?: string
           nickname: string
+          user_id?: string
         }
         Update: {
           created_at?: string
           game_id?: string
           id?: string
           nickname?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "players_game_id_fkey"
+            foreignKeyName: "participants_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -140,36 +158,57 @@ export type Database = {
         Row: {
           body: string
           created_at: string
-          game_id: string
           id: string
           image_url: string | null
           order: number
+          quiz_set_id: string
         }
         Insert: {
           body: string
           created_at?: string
-          game_id: string
           id?: string
           image_url?: string | null
           order: number
+          quiz_set_id: string
         }
         Update: {
           body?: string
           created_at?: string
-          game_id?: string
           id?: string
           image_url?: string | null
           order?: number
+          quiz_set_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "questions_game_id_fkey"
-            columns: ["game_id"]
+            foreignKeyName: "questions_quiz_set_id_fkey"
+            columns: ["quiz_set_id"]
             isOneToOne: false
-            referencedRelation: "games"
+            referencedRelation: "quiz_sets"
             referencedColumns: ["id"]
           },
         ]
+      }
+      quiz_sets: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
       }
     }
     Views: {
