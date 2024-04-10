@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import '../globals.css'
+import '../../globals.css'
 import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -23,8 +23,11 @@ export default function RootLayout({
       <div className="flex">
         <nav className="border-r border-r-gray-200">
           <ul>
-            <li className="h-10 w-52 flex items-center">
-              <Link className="flex items-center" href="/host">
+            <li className="">
+              <Link
+                className="flex items-center h-12 w-52 hover:bg-gray-100"
+                href="/host/dashboard"
+              >
                 <div className="px-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
