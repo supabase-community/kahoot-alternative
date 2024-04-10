@@ -105,13 +105,7 @@ export default function Home({
           // start the quiz game
           const game = payload.new as Game
           setCurrentQuestionSequence(game.current_question_sequence)
-          if (game.phase === 'lobby') {
-            setCurrentScreen(AdminScreens.lobby)
-          } else if (game.phase === 'results') {
-            setCurrentScreen(AdminScreens.result)
-          } else {
-            setCurrentScreen(AdminScreens.quiz)
-          }
+          setCurrentScreen(game.phase as AdminScreens)
         }
       )
       .subscribe()
