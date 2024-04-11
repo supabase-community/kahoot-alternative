@@ -33,12 +33,14 @@ export default function Quiz({
     }
 
     const now = Date.now()
-    const score = Math.round(
-      Math.max(
-        0,
-        Math.min((now - questionStartTime) / QUESTION_ANSWER_TIME, 1)
-      ) * 1000
-    )
+    const score =
+      1000 -
+      Math.round(
+        Math.max(
+          0,
+          Math.min((now - questionStartTime) / QUESTION_ANSWER_TIME, 1)
+        ) * 1000
+      )
 
     const { error } = await supabase.from('answers').insert({
       participant_id: playerId,

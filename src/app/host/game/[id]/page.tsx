@@ -6,6 +6,7 @@ import {
   Game,
   Participant,
   Question,
+  QuizSet,
   supabase,
 } from '@/types/types'
 import { useEffect, useState } from 'react'
@@ -30,7 +31,7 @@ export default function Home({
 
   const [participants, setParticipants] = useState<Participant[]>([])
 
-  const [questions, setQuestions] = useState<Question[]>()
+  const [quizSet, setQuizSet] = useState<QuizSet>()
 
   useEffect(() => {
     getQuestions()
@@ -49,23 +50,20 @@ export default function Home({
       return
     }
     const { data, error } = await supabase
-      .from('questions')
-      .select(`*, choices(*)`)
-      .eq('quiz_set_id', gameData.quiz_set_id)
-      .order('order', { ascending: true })
+      .from('quiz_sets')
+      .select(`*, questions(*, choices(*))`)
+      .eq('id', gameData.quiz_set_id)
+      .order('order', {
+        ascending: true,
+        referencedTable: 'questions',
+      })
+      .single()
     if (error) {
       console.error(error.message)
       getQuestions()
       return
     }
-    setQuestions(data)
-
-    const choiceCount = data.map((rows: Question) => rows.choices.length)
-
-    const correctCount = data.map(
-      (rows) =>
-        rows.choices.filter((choice: Choice) => choice.is_correct).length
-    )
+    setQuizSet(data)
   }
 
   const [currentQuestionSequence, setCurrentQuestionSequence] = useState(0)
@@ -128,21 +126,21 @@ export default function Home({
   }
 
   return (
-    <main className="bg-green-500 min-h-screen">
+    <main className="bg-green-600 min-h-screen">
       {currentScreen == AdminScreens.lobby && (
         <Lobby participants={participants} gameId={gameId}></Lobby>
       )}
       {currentScreen == AdminScreens.quiz && (
         <Quiz
-          question={questions![currentQuestionSequence]}
-          questionCount={questions!.length}
+          question={quizSet!.questions![currentQuestionSequence]}
+          questionCount={quizSet!.questions!.length}
           gameId={gameId}
         ></Quiz>
       )}
       {currentScreen == AdminScreens.result && (
         <Results
           participants={participants!}
-          questions={questions!}
+          quizSet={quizSet!}
           gameId={gameId}
         ></Results>
       )}
