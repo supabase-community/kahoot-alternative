@@ -28,6 +28,7 @@ export default function Results({
         .from('game_results')
         .select()
         .eq('game_id', gameId)
+        .order('total_score', { ascending: false })
       if (error) {
         return alert(error.message)
       }
