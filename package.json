@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/supabase-js": "^2.42.0",
     "next": "14.0.4",
     "next-qrcode": "^2.5.1",
     "react": "^18",

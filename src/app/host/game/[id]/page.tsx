@@ -74,6 +74,7 @@ export default function Home({
     const { data } = await supabase
       .from('participants')
       .select()
+      .eq('game_id', gameId)
       .order('created_at')
     if (data) setParticipants(data)
 

@@ -1,4 +1,10 @@
-import { Answer, Participant, Question, supabase } from '@/types/types'
+import {
+  Answer,
+  GameResult,
+  Participant,
+  Question,
+  supabase,
+} from '@/types/types'
 import { useEffect, useState } from 'react'
 
 export default function Results({
@@ -10,25 +16,18 @@ export default function Results({
   questions: Question[]
   gameId: string
 }) {
-  const [finalOrderedPlayers, setOrderedPlayers] = useState<
-    {
-      id: string
-      correctCount: number
-      player: Participant
-    }[]
-  >([])
+  const [gameResults, setGameResults] = useState<GameResult[]>([])
 
   const getResults = async () => {
     const { data, error } = await supabase
-      .from('answers')
+      .from('game_results')
       .select()
-      .eq('quiz_set_id', gameId)
+      .eq('game_id', gameId)
     if (error) {
       return alert(error.message)
     }
-    const answers = data as Answer[]
 
-    // setOrderedPlayers(orderedPlayers)
+    setGameResults(data)
   }
 
   useEffect(() => {
@@ -38,16 +37,14 @@ export default function Results({
   return (
     <div>
       <h1 className="text-xl pb-4">View Results！</h1>
-      {finalOrderedPlayers.map((player, index) => (
+      {gameResults.map((gameResult, index) => (
         <div
-          key={player.id}
+          key={gameResult.participant_id}
           className="flex justify-between border-b-white border-b-2 py-2"
         >
-          <div>{player.player?.nickname}</div>
+          <div>{gameResult.nickname}</div>
           <div className="flex-grow"></div>
-          <div>
-            {player.correctCount}/{questions.length}
-          </div>
+          <div>{gameResult.total_score}</div>
         </div>
       ))}
     </div>

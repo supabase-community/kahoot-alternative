@@ -36,6 +36,13 @@ export type Database = {
             foreignKeyName: "answers_participant_id_fkey"
             columns: ["participant_id"]
             isOneToOne: false
+            referencedRelation: "game_results"
+            referencedColumns: ["participant_id"]
+          },
+          {
+            foreignKeyName: "answers_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
             referencedRelation: "participants"
             referencedColumns: ["id"]
           },
@@ -212,7 +219,14 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      game_results: {
+        Row: {
+          nickname: string | null
+          participant_id: string | null
+          total_score: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

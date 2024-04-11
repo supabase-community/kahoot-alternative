@@ -1,3 +1,4 @@
+import { TIME_TIL_CHOICE_REVEAL } from '@/constants'
 import { Question, supabase } from '@/types/types'
 import { useEffect, useState } from 'react'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
@@ -35,6 +36,16 @@ export default function Quiz({
     }
   }
 
+  const onTimeUp = async () => {
+    setIsAnswerRevealed(true)
+    await supabase
+      .from('games')
+      .update({
+        is_answer_revealed: true,
+      })
+      .eq('id', gameId)
+  }
+
   useEffect(() => {
     setIsAnswerRevealed(false)
     setHasShownChoices(false)
@@ -44,7 +55,7 @@ export default function Quiz({
       setTimeout(() => {
         setIsAnswerRevealed(true)
       }, 20000)
-    }, 5000)
+    }, TIME_TIL_CHOICE_REVEAL)
   }, [question.id])
 
   return (
@@ -69,7 +80,9 @@ export default function Quiz({
       <div className="flex-grow text-white text-4xl px-4">
         {hasShownChoices && (
           <CountdownCircleTimer
-            onComplete={() => setIsAnswerRevealed(true)}
+            onComplete={() => {
+              onTimeUp()
+            }}
             isPlaying
             duration={20}
             colors={['#004777', '#F7B801', '#A30000', '#A30000']}
