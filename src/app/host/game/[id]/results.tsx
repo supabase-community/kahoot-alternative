@@ -7,6 +7,8 @@ import {
   supabase,
 } from '@/types/types'
 import { useEffect, useState } from 'react'
+import Confetti from 'react-confetti'
+import useWindowSize from 'react-use/lib/useWindowSize'
 
 export default function Results({
   quizSet,
@@ -17,6 +19,8 @@ export default function Results({
   gameId: string
 }) {
   const [gameResults, setGameResults] = useState<GameResult[]>([])
+
+  const { width, height } = useWindowSize()
 
   useEffect(() => {
     const getResults = async () => {
@@ -69,6 +73,7 @@ export default function Results({
           ))}
         </div>
       </div>
+      <Confetti width={width} height={height} recycle={true} />
     </div>
   )
 }
