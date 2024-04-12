@@ -48,6 +48,8 @@ port = 54323
 # External URL of the API server that frontend connects to.
 api_url = "http://localhost"
 
+openai_api_key = "env(OPEN_AI_API_KEY)"
+
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
 [inbucket]
@@ -106,8 +108,8 @@ enable_confirmations = false
 
 # Configure one of the supported SMS providers: `twilio`, `twilio_verify`, `messagebird`, `textlocal`, `vonage`.
 [auth.sms.twilio]
-enabled = false
 account_sid = ""
+enabled = false
 message_service_sid = ""
 # DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
 auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
@@ -116,8 +118,8 @@ auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin`, `notion`, `twitch`,
 # `twitter`, `slack`, `spotify`, `workos`, `zoom`.
 [auth.external.apple]
-enabled = false
 client_id = ""
+enabled = false
 # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
 secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
 # Overrides the default auth redirectUrl.

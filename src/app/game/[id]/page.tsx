@@ -49,6 +49,21 @@ export default function Home({
       setCurrentQuestionSequence(game.current_question_sequence)
       setIsAnswerRevealed(game.is_answer_revealed)
     }
+
+    getQuestions(game.quiz_set_id)
+  }
+
+  const getQuestions = async (quizSetId: string) => {
+    const { data, error } = await supabase
+      .from('questions')
+      .select(`*, choices(*)`)
+      .eq('quiz_set_id', quizSetId)
+      .order('order', { ascending: true })
+    if (error) {
+      getQuestions(quizSetId)
+      return
+    }
+    setQuestions(data)
   }
 
   useEffect(() => {
@@ -81,19 +96,6 @@ export default function Home({
         .subscribe()
     }
 
-    const getQuestions = async () => {
-      const { data, error } = await supabase
-        .from('questions')
-        .select(`*, choices(*)`)
-        .order('order', { ascending: true })
-      if (error) {
-        getQuestions()
-        return
-      }
-      setQuestions(data)
-    }
-
-    getQuestions()
     const gameChannel = setGameListner()
     return () => {
       supabase.removeChannel(gameChannel)

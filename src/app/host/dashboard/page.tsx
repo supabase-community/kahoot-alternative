@@ -45,7 +45,10 @@ export default function Home() {
   return (
     <>
       {quizSet.map((quizSet) => (
-        <div key={quizSet.id} className="flex justify-start shadow m-2 rounded">
+        <div
+          key={quizSet.id}
+          className="flex justify-start shadow my-4 mx-2 rounded"
+        >
           <img className="h-28" src="/default.png" alt="default quiz image" />
           <div className="p-2 flex flex-col justify-between items-stretch flex-grow">
             <h2 className="font-bold">{quizSet.name}</h2>
