@@ -45,7 +45,7 @@ create policy "Participants can insert theirselves" on public.participants for i
 
 alter table public.answers enable row level security;
 create policy "Answers are viewable by everyone." on public.answers for select using (true);
--- create policy "Participants can insert their own answers" on public.answers for insert with check (auth.uid() = participant_id);
+create policy "Participants can insert their own answers" on public.answers for insert with check (true);
 
 alter table public.answers add column choice_id uuid references public.choices(id) on delete set null on update cascade;
 
