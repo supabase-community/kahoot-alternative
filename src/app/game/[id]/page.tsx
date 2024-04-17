@@ -69,7 +69,7 @@ export default function Home({
   useEffect(() => {
     const setGameListner = (): RealtimeChannel => {
       return supabase
-        .channel('game')
+        .channel('game_participant')
         .on(
           'postgres_changes',
           {

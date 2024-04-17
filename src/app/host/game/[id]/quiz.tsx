@@ -1,20 +1,28 @@
 import { TIME_TIL_CHOICE_REVEAL } from '@/constants'
-import { Question, supabase } from '@/types/types'
-import { useEffect, useState } from 'react'
+import { Answer, Participant, Question, supabase } from '@/types/types'
+import { useEffect, useRef, useState } from 'react'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 
 export default function Quiz({
   question: question,
   questionCount: questionCount,
   gameId,
+  participants,
 }: {
   question: Question
   questionCount: number
   gameId: string
+  participants: Participant[]
 }) {
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false)
 
   const [hasShownChoices, setHasShownChoices] = useState(false)
+
+  const [answers, setAnswers] = useState<Answer[]>([])
+
+  const answerStateRef = useRef<Answer[]>()
+
+  answerStateRef.current = answers
 
   const getNextQuestion = async () => {
     var updateData
@@ -49,6 +57,7 @@ export default function Quiz({
   useEffect(() => {
     setIsAnswerRevealed(false)
     setHasShownChoices(false)
+    setAnswers([])
 
     setTimeout(() => {
       setHasShownChoices(true)
@@ -56,6 +65,35 @@ export default function Quiz({
         setIsAnswerRevealed(true)
       }, 20000)
     }, TIME_TIL_CHOICE_REVEAL)
+
+    const channel = supabase
+      .channel('answers')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'answers',
+          filter: `question_id=eq.${question.id}`,
+        },
+        (payload) => {
+          setAnswers((currentAnswers) => {
+            return [...currentAnswers, payload.new as Answer]
+          })
+
+          if (
+            (answerStateRef.current?.length ?? 0) + 1 ===
+            participants.length
+          ) {
+            onTimeUp()
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [question.id])
 
   return (
@@ -77,21 +115,77 @@ export default function Quiz({
         </h2>
       </div>
 
-      <div className="flex-grow text-white text-4xl px-4">
-        {hasShownChoices && (
-          <CountdownCircleTimer
-            onComplete={() => {
-              onTimeUp()
-            }}
-            isPlaying
-            duration={20}
-            colors={['#004777', '#F7B801', '#A30000', '#A30000']}
-            colorsTime={[7, 5, 2, 0]}
-          >
-            {({ remainingTime }) => remainingTime}
-          </CountdownCircleTimer>
+      <div className="flex-grow text-white px-8">
+        {hasShownChoices && !isAnswerRevealed && (
+          <div className="flex justify-between items-center">
+            <div className="text-5xl">
+              <CountdownCircleTimer
+                onComplete={() => {
+                  onTimeUp()
+                }}
+                isPlaying
+                duration={20}
+                colors={['#004777', '#F7B801', '#A30000', '#A30000']}
+                colorsTime={[7, 5, 2, 0]}
+              >
+                {({ remainingTime }) => remainingTime}
+              </CountdownCircleTimer>
+            </div>
+            <div className="text-center">
+              <div className="text-6xl pb-4">{answers.length}</div>
+              <div className="text-3xl">Answers</div>
+            </div>
+          </div>
         )}
-        {/* {isAnswerRevealed && <div>TODO: display answer counts</div>} */}
+        {isAnswerRevealed && (
+          <div className="flex justify-center">
+            {question.choices.map((choice, index) => (
+              <div
+                key={choice.id}
+                className="mx-2 h-48 w-24 flex flex-col items-stretch justify-end"
+              >
+                <div className="flex-grow relative">
+                  <div
+                    style={{
+                      height: `${
+                        (answers.filter(
+                          (answer) => answer.choice_id === choice.id
+                        ).length *
+                          100) /
+                        (answers.length || 1)
+                      }%`,
+                    }}
+                    className={`absolute bottom-0 left-0 right-0 mb-1 rounded-t ${
+                      index === 0
+                        ? 'bg-red-500'
+                        : index === 1
+                        ? 'bg-blue-500'
+                        : index === 2
+                        ? 'bg-yellow-500'
+                        : 'bg-green-500'
+                    }`}
+                  ></div>
+                </div>
+                <div
+                  className={`mt-1 text-white text-lg text-center py-2 rounded-b ${
+                    index === 0
+                      ? 'bg-red-500'
+                      : index === 1
+                      ? 'bg-blue-500'
+                      : index === 2
+                      ? 'bg-yellow-500'
+                      : 'bg-green-500'
+                  }`}
+                >
+                  {
+                    answers.filter((answer) => answer.choice_id === choice.id)
+                      .length
+                  }
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {hasShownChoices && (

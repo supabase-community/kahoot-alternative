@@ -23,8 +23,21 @@ export default function Home() {
   }, [])
 
   const startGame = async (quizSetId: string) => {
+    let userId: string | null = null
+
+    const { data: sessionData, error: sessionError } =
+      await supabase.auth.getSession()
+
+    if (sessionData.session) {
+      userId = sessionData.session?.user.id ?? null
+    } else {
+      const { data, error } = await supabase.auth.signInAnonymously()
+      if (error) console.error(error)
+      userId = data?.user?.id ?? null
+    }
+
     setIsLoadingGame(true)
-    console.log('start game clicked')
+
     const { data, error } = await supabase
       .from('games')
       .insert({

@@ -28,23 +28,21 @@ export default function Quiz({
   const answer = async (choice: Choice) => {
     setChosenChoice(choice)
 
-    if (!choice.is_correct) {
-      return
-    }
-
     const now = Date.now()
-    const score =
-      1000 -
-      Math.round(
-        Math.max(
-          0,
-          Math.min((now - questionStartTime) / QUESTION_ANSWER_TIME, 1)
-        ) * 1000
-      )
+    const score = !choice.is_correct
+      ? 0
+      : 1000 -
+        Math.round(
+          Math.max(
+            0,
+            Math.min((now - questionStartTime) / QUESTION_ANSWER_TIME, 1)
+          ) * 1000
+        )
 
     const { error } = await supabase.from('answers').insert({
       participant_id: playerId,
       question_id: question.id,
+      choice_id: choice.id,
       score,
     })
     if (error) {

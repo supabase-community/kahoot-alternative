@@ -18,8 +18,6 @@ export default function Lobby({
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession()
 
-      console.log({ sessionData, sessionError })
-
       if (sessionData.session) {
         userId = sessionData.session?.user.id ?? null
       } else {
@@ -27,8 +25,6 @@ export default function Lobby({
         if (error) console.error(error)
         userId = data?.user?.id ?? null
       }
-
-      console.log({ userId })
 
       if (!userId) {
         return

@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       answers: {
         Row: {
+          choice_id: string | null
           created_at: string
           id: string
           participant_id: string
@@ -18,13 +19,15 @@ export type Database = {
           score: number
         }
         Insert: {
+          choice_id?: string | null
           created_at?: string
           id?: string
-          participant_id: string
+          participant_id?: string
           question_id: string
           score: number
         }
         Update: {
+          choice_id?: string | null
           created_at?: string
           id?: string
           participant_id?: string
@@ -32,6 +35,13 @@ export type Database = {
           score?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "answers_choice_id_fkey"
+            columns: ["choice_id"]
+            isOneToOne: false
+            referencedRelation: "choices"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "answers_participant_id_fkey"
             columns: ["participant_id"]
@@ -91,6 +101,7 @@ export type Database = {
         Row: {
           created_at: string
           current_question_sequence: number
+          host_user_id: string | null
           id: string
           is_answer_revealed: boolean
           phase: string
@@ -99,6 +110,7 @@ export type Database = {
         Insert: {
           created_at?: string
           current_question_sequence?: number
+          host_user_id?: string | null
           id?: string
           is_answer_revealed?: boolean
           phase?: string
@@ -107,12 +119,20 @@ export type Database = {
         Update: {
           created_at?: string
           current_question_sequence?: number
+          host_user_id?: string | null
           id?: string
           is_answer_revealed?: boolean
           phase?: string
           quiz_set_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "games_host_user_id_fkey"
+            columns: ["host_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "games_quiz_set_id_fkey"
             columns: ["quiz_set_id"]
@@ -145,6 +165,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "participants_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "game_results"
+            referencedColumns: ["game_id"]
+          },
           {
             foreignKeyName: "participants_game_id_fkey"
             columns: ["game_id"]
@@ -221,6 +248,7 @@ export type Database = {
     Views: {
       game_results: {
         Row: {
+          game_id: string | null
           nickname: string | null
           participant_id: string | null
           total_score: number | null
@@ -229,7 +257,15 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      add_question: {
+        Args: {
+          quiz_set_id: string
+          body: string
+          order: number
+          choices: Json[]
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
