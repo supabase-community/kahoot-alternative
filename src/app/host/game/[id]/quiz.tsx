@@ -61,9 +61,6 @@ export default function Quiz({
 
     setTimeout(() => {
       setHasShownChoices(true)
-      setTimeout(() => {
-        setIsAnswerRevealed(true)
-      }, 20000)
     }, TIME_TIL_CHOICE_REVEAL)
 
     const channel = supabase
