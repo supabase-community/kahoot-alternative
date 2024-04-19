@@ -380,3 +380,130 @@ select
       '{"body": "01010101", "is_correct": false}'::json
     ]
   );
+
+-- insert Portuguese quiz
+insert into public.quiz_sets
+    (id, name, description)
+    values ('0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab', 'Supabase Meetup Quiz Português', 'A quiz for the Supabase Meetup in Português');
+
+
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'Qual é o nome original de JavaScript?'::text,
+    "order" => 0,
+    choices => array[
+      '{"body": "Mocha", "is_correct": true}'::json,
+      '{"body": "LiveScript", "is_correct": false}'::json,
+      '{"body": "ECMAScript", "is_correct": false}'::json,
+      '{"body": "JScript", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'Qual o sigificado da sigla API?'::text,
+    "order" => 1,
+    choices => array[
+      '{"body": "Application Programming Interface", "is_correct": true}'::json,
+      '{"body": "Automated Programming Instructions", "is_correct": false}'::json,
+      '{"body": "Advanced Program Integration", "is_correct": false}'::json,
+      '{"body": "Algorithmic Programming Interface", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'Quantas estrelas tem o repositório da Supabase?'::text,
+    "order" => 2,
+    choices => array[
+      '{"body": "45k", "is_correct": false}'::json,
+      '{"body": "55k", "is_correct": false}'::json,
+      '{"body": "65k", "is_correct": true}'::json,
+      '{"body": "75k", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'De acordo com a pesquisa do Stack Overflow em 2023 qual é o banco de dados mais popular?'::text,
+    "order" => 3,
+    choices => array[
+      '{"body": "PostgreSQL", "is_correct": true}'::json,
+      '{"body": "MySQL", "is_correct": false}'::json,
+      '{"body": "Microsoft SQL Server", "is_correct": false}'::json,
+      '{"body": "Excel", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'Quantas linhas de código existe no Windows 10?'::text,
+    "order" => 4,
+    choices => array[
+      '{"body": "50万行", "is_correct": false}'::json,
+      '{"body": "500万行", "is_correct": false}'::json,
+      '{"body": "5,000万行", "is_correct": true}'::json,
+      '{"body": "5億行", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'Em que ano foi publicado TypeScript? '::text,
+    "order" => 5,
+    choices => array[
+      '{"body": "2001年", "is_correct": false}'::json,
+      '{"body": "2009年", "is_correct": false}'::json,
+      '{"body": "2012年", "is_correct": true}'::json,
+      '{"body": "2018年", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'Qual é a biblioteca mais usada de Supabase entre todos os projetos?'::text,
+    "order" => 6,
+    choices => array[
+      '{"body": "Python", "is_correct": false}'::json,
+      '{"body": "Flutter", "is_correct": false}'::json,
+      '{"body": "Javascript", "is_correct": true}'::json,
+      '{"body": "SSR", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'Onde está escritório principal do Opera Browser?'::text,
+    "order" => 7,
+    choices => array[
+      '{"body": "Dinamarca", "is_correct": false}'::json,
+      '{"body": "Noruega", "is_correct": true}'::json,
+      '{"body": "Singapura", "is_correct": false}'::json,
+      '{"body": "Quénia", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => '¿Quem é o autor original do framework React? '::text,
+    "order" => 8,
+    choices => array[
+      '{"body": "Steve Jobs", "is_correct": false}'::json,
+      '{"body": "Jordan Walke", "is_correct": true}'::json,
+      '{"body": "Dan Abramov", "is_correct": false}'::json,
+      '{"body": "Guido van Rossum", "is_correct": false}'::json
+    ]
+  );
+select
+  add_question (
+    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
+    body => 'Em código ASCII, como é a representação binária da letra W maiuscula?'::text,
+    "order" => 9,
+    choices => array[
+      '{"body": "01010111", "is_correct": true}'::json,
+      '{"body": "11010111", "is_correct": false}'::json,
+      '{"body": "01000111", "is_correct": false}'::json,
+      '{"body": "01010101", "is_correct": false}'::json
+    ]
+  );
