@@ -18,9 +18,7 @@ export default function Home({
   params: { id: string }
 }) {
   const onRegisterCompleted = (participant: Participant) => {
-    console.log({ participant })
     setParticipant(participant)
-    setCurrentScreen(Screens.lobby)
     getGame()
   }
 
@@ -110,7 +108,7 @@ export default function Home({
           gameId={gameId}
         ></Lobby>
       )}
-      {currentScreen == Screens.quiz && (
+      {currentScreen == Screens.quiz && questions && (
         <Quiz
           question={questions![currentQuestionSequence]}
           questionCount={questions!.length}

@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from 'react'
 
 export default function Lobby({
   gameId,
-  onRegisterCompleted: onRegisterCompleted,
+  onRegisterCompleted,
 }: {
   gameId: string
   onRegisterCompleted: (participant: Participant) => void
@@ -48,7 +48,7 @@ export default function Lobby({
     }
 
     fetchParticipant()
-  }, [gameId])
+  }, [gameId, onRegisterCompleted])
 
   return (
     <div className="bg-green-500 flex justify-center items-center min-h-screen">
@@ -79,7 +79,7 @@ export default function Lobby({
 }
 
 function Register({
-  onRegisterCompleted: onRegisterComplete,
+  onRegisterCompleted,
   gameId,
 }: {
   onRegisterCompleted: (player: Participant) => void
@@ -104,9 +104,7 @@ function Register({
       return alert(error.message)
     }
 
-    console.log('register component', { participant })
-
-    onRegisterComplete(participant)
+    onRegisterCompleted(participant)
   }
 
   const [nickname, setNickname] = useState('')
