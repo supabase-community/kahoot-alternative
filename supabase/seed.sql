@@ -441,10 +441,10 @@ select
     body => 'Quantas linhas de código existe no Windows 10?'::text,
     "order" => 4,
     choices => array[
-      '{"body": "50万行", "is_correct": false}'::json,
-      '{"body": "500万行", "is_correct": false}'::json,
-      '{"body": "5,000万行", "is_correct": true}'::json,
-      '{"body": "5億行", "is_correct": false}'::json
+      '{"body": "500,000", "is_correct": false}'::json,
+      '{"body": "5 million", "is_correct": false}'::json,
+      '{"body": "50 million", "is_correct": true}'::json,
+      '{"body": "500 million", "is_correct": false}'::json
     ]
   );
 select
@@ -453,10 +453,10 @@ select
     body => 'Em que ano foi publicado TypeScript? '::text,
     "order" => 5,
     choices => array[
-      '{"body": "2001年", "is_correct": false}'::json,
-      '{"body": "2009年", "is_correct": false}'::json,
-      '{"body": "2012年", "is_correct": true}'::json,
-      '{"body": "2018年", "is_correct": false}'::json
+      '{"body": "2001", "is_correct": false}'::json,
+      '{"body": "2009", "is_correct": false}'::json,
+      '{"body": "2012", "is_correct": true}'::json,
+      '{"body": "2018", "is_correct": false}'::json
     ]
   );
 select
