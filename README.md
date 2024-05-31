@@ -19,7 +19,7 @@ This project aims to provide similar functionality to Kahoot while being customi
 
 
 ## Run Locally
-```javascript
+```sh
 # Install dependencies 
 
 npm install
