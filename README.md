@@ -32,7 +32,7 @@ supabase start
 
 npm run dev
 
-Access app in your web browser at `http://localhost:3000`. 
+# Access app in your web browser at `http://localhost:3000`. 
 
 ```
 
