@@ -25,6 +25,10 @@ export default function Home() {
     const { data: sessionData, error: sessionError } =
       await supabase.auth.getSession()
 
+    if (!sessionData.session) {
+      await supabase.auth.signInAnonymously()
+    }
+
     const { data, error } = await supabase
       .from('games')
       .insert({
@@ -33,6 +37,7 @@ export default function Home() {
       .select()
       .single()
     if (error) {
+      console.error(error)
       alert('Failed to start game')
       return
     }
