@@ -1,7 +1,7 @@
--- insert english quiz
+-- insert english quiz for GA week
 insert into public.quiz_sets
     (id, name, description)
-    values ('bb2ddb95-f632-48bd-a042-eb07b3f7ef8d', 'Supabase Meetup Quiz', 'A quiz for the Supabase Meetup');
+    values ('bb2ddb95-f632-48bd-a042-eb07b3f7ef8d', 'GA Week Supabase Meetup Quiz', 'A quiz for the Supabase Meetup');
 
 
 select
@@ -43,7 +43,7 @@ select
 select
   add_question (
     quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'According to the Stack Overflow Survey 2023 what is the most popular database language amongst respondents?'::text,
+    body => 'According to the Stack Overflow Survey 2022 what is the most popular database language amongst respondents?'::text,
     "order" => 3,
     choices => array[
       '{"body": "PostgreSQL", "is_correct": true}'::json,
@@ -126,10 +126,10 @@ select
   );
 
 
--- insert Spanish quiz
+-- insert Spanish quiz for GA week
 insert into public.quiz_sets
     (id, name, description)
-    values ('9a525135-cd91-4372-9171-02fc57c6713a', 'Supabase Meetup Quiz Español', 'Un cuestionario para el Supabase Meetup');
+    values ('9a525135-cd91-4372-9171-02fc57c6713a', 'GA Week Supabase Meetup Quiz Español', 'Un cuestionario para el Supabase Meetup');
 
 
 select
@@ -254,10 +254,10 @@ select
   );
 
 
--- insert Japanese quiz
+-- insert Japanese quiz for GA week
 insert into public.quiz_sets
     (id, name, description)
-    values ('ac8483a1-fb60-4d65-b898-58f830bbabdd', 'Supabase Meetup Quiz 日本語', 'A quiz for the Supabase Meetup in Japanese');
+    values ('ac8483a1-fb60-4d65-b898-58f830bbabdd', 'GA Week Supabase Meetup Quiz 日本語', 'A quiz for the Supabase Meetup in Japanese');
 
 
 select
@@ -381,7 +381,7 @@ select
     ]
   );
 
--- insert Portuguese quiz
+-- insert Portuguese quiz for GA week
 insert into public.quiz_sets
     (id, name, description)
     values ('0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab', 'Supabase Meetup Quiz Português', 'A quiz for the Supabase Meetup in Português');
@@ -505,5 +505,102 @@ select
       '{"body": "11010111", "is_correct": false}'::json,
       '{"body": "01000111", "is_correct": false}'::json,
       '{"body": "01010101", "is_correct": false}'::json
+    ]
+  );
+
+-- Insert LW12 quiz
+insert into public.quiz_sets
+    (id, name, description)
+    values ('ae53ca2c-c7f4-4b31-8b71-51fab618a74f', 'LW12 Meetup Quiz', 'A quiz for the LW12 Supabase Meetup');
+
+
+select
+  add_question (
+    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
+    body => 'What was the launch on day 1 of LW12?'::text,
+    "order" => 0,
+    choices => array[
+      '{"body": "VS Code extension", "is_correct": true}'::json,
+      '{"body": "Supabase goes GA", "is_correct": false}'::json,
+      '{"body": "postgres.new", "is_correct": true}'::json,
+      '{"body": "anonymous sign-in", "is_correct": false}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
+    body => 'How many GitHub stars does the main supabase repo have?'::text,
+    "order" => 1,
+    choices => array[
+      '{"body": "40k", "is_correct": false}'::json,
+      '{"body": "50k", "is_correct": false}'::json,
+      '{"body": "60k", "is_correct": false}'::json,
+      '{"body": "70k", "is_correct": true}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
+    body => 'According to the 2023 Stack Overflow developer survey, what is the most popular database?'::text,
+    "order" => 2,
+    choices => array[
+      '{"body": "MySQL", "is_correct": false}'::json,
+      '{"body": "Postgres", "is_correct": true}'::json,
+      '{"body": "Excel", "is_correct": false}'::json,
+      '{"body": "Microsoft SQL Server", "is_correct": false}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
+    body => 'Which product was the first product offered by Supabase?'::text,
+    "order" => 3,
+    choices => array[
+      '{"body": "Auto generated APIs", "is_correct": false}'::json,
+      '{"body": "Realtime", "is_correct": true}'::json,
+      '{"body": "Auth", "is_correct": false}'::json,
+      '{"body": "Storage", "is_correct": false}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
+    body => 'Which of the following client libraries is currently maintained by the community?'::text,
+    "order" => 4,
+    choices => array[
+      '{"body": "JavaScript", "is_correct": false}'::json,
+      '{"body": "Flutter(Dart)", "is_correct": false}'::json,
+      '{"body": "Swift", "is_correct": false}'::json,
+      '{"body": "Kotlin", "is_correct": true}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
+    body => 'How many different locations is the Supabase LW12 meetup being held at?'::text,
+    "order" => 5,
+    choices => array[
+      '{"body": "10 - 20", "is_correct": false}'::json,
+      '{"body": "20 - 30", "is_correct": false}'::json,
+      '{"body": "30 - 40", "is_correct": false}'::json,
+      '{"body": "Over 40", "is_correct": true}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
+    body => 'What might you win when you create your LW12 ticket and share it on socials?'::text,
+    "order" => 6,
+    choices => array[
+      '{"body": "Supabase World Tour T-Shirt", "is_correct": true}'::json,
+      '{"body": "Mechanical Keyboard", "is_correct": false}'::json,
+      '{"body": "Supabase iPhone case", "is_correct": false}'::json,
+      '{"body": "Wandrd Backpack", "is_correct": true}'::json
     ]
   );

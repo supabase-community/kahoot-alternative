@@ -13,6 +13,7 @@ export default function Home() {
       const { data, error } = await supabase
         .from('quiz_sets')
         .select(`*, questions(*, choices(*))`)
+        .order('created_at', { ascending: false })
       if (error) {
         alert('Failed to fetch quiz sets')
         return
@@ -23,18 +24,8 @@ export default function Home() {
   }, [])
 
   const startGame = async (quizSetId: string) => {
-    let userId: string | null = null
-
     const { data: sessionData, error: sessionError } =
       await supabase.auth.getSession()
-
-    if (sessionData.session) {
-      userId = sessionData.session?.user.id ?? null
-    } else {
-      const { data, error } = await supabase.auth.signInAnonymously()
-      if (error) console.error(error)
-      userId = data?.user?.id ?? null
-    }
 
     setIsLoadingGame(true)
 
