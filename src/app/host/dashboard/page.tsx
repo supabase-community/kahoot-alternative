@@ -6,8 +6,6 @@ import { useEffect, useState } from 'react'
 export default function Home() {
   const [quizSet, setQuizSet] = useState<QuizSet[]>([])
 
-  const [isLoadingGame, setIsLoadingGame] = useState(false)
-
   useEffect(() => {
     const getQuizSets = async () => {
       const { data, error } = await supabase
@@ -27,8 +25,6 @@ export default function Home() {
     const { data: sessionData, error: sessionError } =
       await supabase.auth.getSession()
 
-    setIsLoadingGame(true)
-
     const { data, error } = await supabase
       .from('games')
       .insert({
@@ -36,7 +32,6 @@ export default function Home() {
       })
       .select()
       .single()
-    setIsLoadingGame(false)
     if (error) {
       alert('Failed to start game')
       return
