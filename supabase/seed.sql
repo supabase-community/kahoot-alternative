@@ -605,6 +605,7 @@ select
     ]
   );
 
+
 -- lw14
 insert into public.quiz_sets
     (id, name, description)
@@ -652,7 +653,7 @@ select
 select
   add_question (
     quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
-    body => 'What does the acronym 'API' stand for in software development?'::text,
+    body => 'What does the acronym "API" stand for in software development?'::text,
     "order" => 3,
     choices => array[
       '{"body": "Application Programming Interface", "is_correct": true}'::json,
