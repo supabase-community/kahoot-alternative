@@ -604,3 +604,99 @@ select
       '{"body": "Wandrd Backpack", "is_correct": true}'::json
     ]
   );
+
+-- lw14
+insert into public.quiz_sets
+    (id, name, description)
+    values ('8177fdea-a757-4939-9e0e-4b0e8e90dfb8', 'LW14 Meetup Quiz', 'A quiz for the LW14 Supabase Meetup');
+
+select
+  add_question (
+    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
+    body => 'According to the Stack Overflow Survey 2024 what is the most popular database language amongst respondents?'::text,
+    "order" => 0,
+    choices => array[
+      '{"body": "PostgreSQL", "is_correct": true}'::json,
+      '{"body": "MySQL", "is_correct": false}'::json,
+      '{"body": "Microsoft SQL Server", "is_correct": false}'::json,
+      '{"body": "Excel", "is_correct": false}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
+    body => 'How many GitHub stars does the main supabase repo have?'::text,
+    "order" => 1,
+    choices => array[
+      '{"body": "50k", "is_correct": false}'::json,
+      '{"body": "60k", "is_correct": false}'::json,
+      '{"body": "70k", "is_correct": false}'::json,
+      '{"body": "80k", "is_correct": true}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
+    body => 'Which HTTP status code indicates that a resource was not found?'::text,
+    "order" => 2,
+    choices => array[
+      '{"body": "200", "is_correct": false}'::json,
+      '{"body": "301", "is_correct": false}'::json,
+      '{"body": "404", "is_correct": true}'::json,
+      '{"body": "500", "is_correct": false}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
+    body => 'What does the acronym 'API' stand for in software development?'::text,
+    "order" => 3,
+    choices => array[
+      '{"body": "Application Programming Interface", "is_correct": true}'::json,
+      '{"body": "Advanced Programming Integration", "is_correct": false}'::json,
+      '{"body": "Automated Process Implementation", "is_correct": false}'::json,
+      '{"body": "Application Process Integration", "is_correct": false}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
+    body => 'Which of the following companies use Postgres database?'::text,
+    "order" => 4,
+    choices => array[
+      '{"body": "Reddit", "is_correct": true}'::json,
+      '{"body": "Notion", "is_correct": true}'::json,
+      '{"body": "Figma", "is_correct": true}'::json,
+      '{"body": "Twitch", "is_correct": true}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
+    body => 'MCP, a protocol for connecting AI assistants to other systems stands for'::text,
+    "order" => 5,
+    choices => array[
+      '{"body": "Model Context Programming", "is_correct": false}'::json,
+      '{"body": "Model Context Protocol", "is_correct": true}'::json,
+      '{"body": "Machine Communication Protocol", "is_correct": false}'::json,
+      '{"body": "Multi Context Protocol", "is_correct": false}'::json
+    ]
+  );
+
+select
+  add_question (
+    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
+    body => 'What year was TypeScript released to the public?'::text,
+    "order" => 6,
+    choices => array[
+      '{"body": "2001", "is_correct": false}'::json,
+      '{"body": "2009", "is_correct": false}'::json,
+      '{"body": "2012", "is_correct": true}'::json,
+      '{"body": "2018", "is_correct": false}'::json
+    ]
+  );
