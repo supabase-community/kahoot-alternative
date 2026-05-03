@@ -129,6 +129,18 @@ export default function QAPage() {
     }
   }
 
+  const markOwnAnswered = async (questionId: string) => {
+    await supabase
+      .from('qa_questions' as any)
+      .update({ answered_at: new Date().toISOString() })
+      .eq('id', questionId)
+  }
+
+  const deleteOwn = async (questionId: string) => {
+    if (!confirm('Delete your question?')) return
+    await supabase.from('qa_questions' as any).delete().eq('id', questionId)
+  }
+
   // ----- render -----
 
   if (!nickname) {
@@ -201,26 +213,48 @@ export default function QAPage() {
         </h2>
 
         <ul className="space-y-3">
-          {ranked.map((q) => (
-            <li key={q.id} className="bg-slate-800 rounded-lg p-4 flex gap-4">
-              <button
-                onClick={() => toggleUpvote(q.id, q.votedByMe)}
-                className={`flex flex-col items-center justify-center w-14 rounded ${
-                  q.votedByMe ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-300'
-                }`}
-                aria-label={q.votedByMe ? 'Remove upvote' : 'Upvote'}
-              >
-                <span className="text-xl leading-none">▲</span>
-                <span className="font-bold text-lg leading-none mt-1">{q.upvotes}</span>
-              </button>
-              <div className="flex-1 min-w-0">
-                <p className="text-white whitespace-pre-wrap break-words">{q.body}</p>
-                <p className="text-xs text-slate-400 mt-2">
-                  {q.author_nickname} · {new Date(q.created_at).toLocaleTimeString()}
-                </p>
-              </div>
-            </li>
-          ))}
+          {ranked.map((q) => {
+            const isMine = q.author_user_id === userId
+            return (
+              <li key={q.id} className="bg-slate-800 rounded-lg p-4 flex gap-4">
+                <button
+                  onClick={() => toggleUpvote(q.id, q.votedByMe)}
+                  className={`flex flex-col items-center justify-center w-14 rounded ${
+                    q.votedByMe ? 'bg-green-600 text-white' : 'bg-slate-700 text-slate-300'
+                  }`}
+                  aria-label={q.votedByMe ? 'Remove upvote' : 'Upvote'}
+                >
+                  <span className="text-xl leading-none">▲</span>
+                  <span className="font-bold text-lg leading-none mt-1">{q.upvotes}</span>
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white whitespace-pre-wrap break-words">{q.body}</p>
+                  <p className="text-xs text-slate-400 mt-2">
+                    {q.author_nickname}
+                    {isMine && <span className="text-green-400 ml-1">(you)</span>}
+                    {' · '}
+                    {new Date(q.created_at).toLocaleTimeString()}
+                  </p>
+                  {isMine && (
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => markOwnAnswered(q.id)}
+                        className="text-xs px-2 py-1 rounded bg-slate-700 text-slate-200 hover:bg-slate-600"
+                      >
+                        ✓ Mark answered
+                      </button>
+                      <button
+                        onClick={() => deleteOwn(q.id)}
+                        className="text-xs px-2 py-1 rounded bg-red-900 text-red-200 hover:bg-red-800"
+                      >
+                        🗑 Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </div>
     </main>
