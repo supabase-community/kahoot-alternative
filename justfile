@@ -90,22 +90,34 @@ open:
     if [ -z "${APP:-}" ]; then echo "ngrok not running — run \`just start\` first"; exit 1; fi
     open "$APP/host/dashboard"
 
-# Show current ngrok public URLs.
+# Show current public tunnel URLs (ngrok if running, else cloudflared from /tmp/cf-*.log).
 urls:
     #!/usr/bin/env bash
-    set -euo pipefail
-    if ! curl -sf http://127.0.0.1:4040/api/tunnels >/dev/null 2>&1; then
-        echo "ngrok not running — run \`just start\`"; exit 1
+    set -uo pipefail
+    if curl -sf http://127.0.0.1:4040/api/tunnels >/dev/null 2>&1; then
+        echo "ngrok tunnels:"
+        curl -s http://127.0.0.1:4040/api/tunnels | python3 -c "import json, sys; [print(f\"  {t['name']:10}  {t['public_url']}\") for t in json.load(sys.stdin)['tunnels']]"
+    elif pgrep -f "cloudflared tunnel" >/dev/null; then
+        echo "cloudflared tunnels:"
+        for log in /tmp/cf-app.log /tmp/cf-qa.log /tmp/cf-supabase.log; do
+            name=$(basename "$log" .log | sed 's/^cf-//')
+            url=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$log" 2>/dev/null | head -1)
+            [ -n "$url" ] && printf "  %-10s %s\n" "$name" "$url"
+        done
+    else
+        echo "no tunnels running — \`just start\` (ngrok) or run cloudflared manually"
+        exit 1
     fi
-    curl -s http://127.0.0.1:4040/api/tunnels | python3 -c "import json, sys; [print(f\"  {t['name']:10}  {t['public_url']}\") for t in json.load(sys.stdin)['tunnels']]"
 
 # One-line health check of every service.
 status:
     #!/usr/bin/env bash
-    docker ps >/dev/null 2>&1                                              && echo "✓ Docker"   || echo "✗ Docker"
-    curl -sf http://127.0.0.1:54321/rest/v1/ -H "apikey: x" >/dev/null 2>&1 && echo "✓ Supabase" || echo "✗ Supabase"
-    curl -sf http://127.0.0.1:4040/api/tunnels >/dev/null 2>&1             && echo "✓ ngrok"    || echo "✗ ngrok"
-    curl -sf http://localhost:3000 >/dev/null 2>&1                          && echo "✓ Next.js"  || echo "✗ Next.js"
+    docker ps >/dev/null 2>&1                                              && echo "✓ Docker"      || echo "✗ Docker"
+    curl -sf http://127.0.0.1:54321/rest/v1/ -H "apikey: x" >/dev/null 2>&1 && echo "✓ Supabase"    || echo "✗ Supabase"
+    curl -sf http://127.0.0.1:4040/api/tunnels >/dev/null 2>&1             && echo "✓ ngrok"       || echo "  ngrok not running"
+    pgrep -f "cloudflared tunnel" >/dev/null                                && echo "✓ cloudflared" || echo "  cloudflared not running"
+    curl -sf http://localhost:3000 >/dev/null 2>&1                          && echo "✓ Next.js (3000)" || echo "✗ Next.js (3000)"
+    curl -sf http://localhost:3001 >/dev/null 2>&1                          && echo "✓ Next.js (3001 — Q&A)" || echo "  Next.js (3001) not running"
 
 # Wipe game/participant state between cohorts (keeps quiz questions).
 reset:
