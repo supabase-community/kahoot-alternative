@@ -38,7 +38,10 @@ export default function Lobby({
         .maybeSingle()
 
       if (error) {
-        return alert(error.message)
+        // Don't alert on transient lobby-fetch errors; they crash the UX with
+        // an alert loop. Just log and let the user retry by interacting.
+        console.error('fetchParticipant:', error)
+        return
       }
 
       if (participantData) {

@@ -51,14 +51,20 @@ export default function Home({
     getQuestions(game.quiz_set_id)
   }
 
-  const getQuestions = async (quizSetId: string) => {
+  const getQuestions = async (quizSetId: string, attempt: number = 0) => {
     const { data, error } = await supabase
       .from('questions')
       .select(`*, choices(*)`)
       .eq('quiz_set_id', quizSetId)
       .order('order', { ascending: true })
     if (error) {
-      getQuestions(quizSetId)
+      // Backoff retry, but cap at 5 attempts so we don't spam endless alerts
+      // when the network is genuinely broken.
+      if (attempt >= 5) {
+        console.error('getQuestions: giving up after 5 retries', error)
+        return
+      }
+      setTimeout(() => getQuestions(quizSetId, attempt + 1), 500 * (attempt + 1))
       return
     }
     setQuestions(data)
