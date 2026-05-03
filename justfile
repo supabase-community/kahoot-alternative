@@ -3,6 +3,11 @@
 
 set shell := ["bash", "-uc"]
 
+# Where the curriculum repo lives. Quiz SQL files matching
+# `Data Track/Week */assets/week_*__live_quiz.sql` are auto-loaded by
+# `just load-quizzes` and re-loaded by `just watch-quizzes` on save.
+curriculum_repo := "/Users/lasse/Documents/github/hyf/datatrack"
+
 # Default: list recipes
 default:
     @just --list
@@ -63,6 +68,10 @@ start:
     fi
     echo "✓ Next.js"
 
+    # 6. Auto-load curriculum quiz SQL files (idempotent — each file is a
+    #    DELETE-then-INSERT for its own quiz_set IDs).
+    just load-quizzes
+
     echo ""
     echo "──────────────────────────────────────────────────────"
     echo " Quiz live!"
@@ -102,9 +111,58 @@ status:
 reset:
     supabase db reset
 
-# Stop Next.js + tunnels (ngrok + cloudflared) + Supabase. Docker Desktop stays up.
-# Always run this when you're done with a session — leaving the Supabase
-# tunnel exposed lets strangers hit the REST API with the anon key.
+# Auto-load every `Data Track/Week */assets/week_*__live_quiz.sql` from the curriculum repo into the running Supabase. Idempotent — replaces in place.
+load-quizzes:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    if ! curl -sf http://127.0.0.1:54321/rest/v1/ -H "apikey: x" >/dev/null 2>&1; then
+        echo "✗ Supabase not running — run \`just start\` first"; exit 1
+    fi
+    shopt -s nullglob
+    files=("{{ curriculum_repo }}/Data Track"/Week*/assets/week_*__live_quiz.sql)
+    if [ ${#files[@]} -eq 0 ]; then
+        echo "  (no curriculum quiz files found under {{ curriculum_repo }}/Data Track/Week */assets/)"
+        exit 0
+    fi
+    for f in "${files[@]}"; do
+        if PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -v ON_ERROR_STOP=1 -q -f "$f" >/dev/null 2>&1; then
+            echo "✓ loaded $(basename "$f")"
+        else
+            echo "✗ failed  $(basename "$f") — re-run with \`PGPASSWORD=postgres psql -h 127.0.0.1 -p 54322 -U postgres -d postgres -f \"$f\"\` to see the error"
+        fi
+    done
+
+# Watch curriculum quiz files; reload on save (uses fswatch if installed, else 1s polling). Ctrl+C to stop.
+watch-quizzes:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    glob="{{ curriculum_repo }}/Data Track/Week */assets/week_*__live_quiz.sql"
+    echo "watching: $glob"
+    echo "Ctrl+C to stop."
+    if command -v fswatch >/dev/null 2>&1; then
+        # fswatch event-driven (instant)
+        fswatch -o {{ curriculum_repo }}/"Data Track" \
+            --include 'week_.*__live_quiz\.sql$' --exclude '.*' \
+            | while read -r _; do
+                echo "→ change detected"
+                just load-quizzes
+            done
+    else
+        # Polling fallback. Compute a fingerprint of all matching files'
+        # mtime + size and re-scan on change.
+        prev=""
+        while true; do
+            cur=$(stat -f '%m %z %N' {{ curriculum_repo }}/"Data Track"/Week*/assets/week_*__live_quiz.sql 2>/dev/null | sort | shasum)
+            if [ "$cur" != "$prev" ] && [ -n "$prev" ]; then
+                echo "→ change detected"
+                just load-quizzes
+            fi
+            prev="$cur"
+            sleep 1
+        done
+    fi
+
+# Stop Next.js + ngrok + cloudflared + Supabase. Run when session ends — keeps the Supabase tunnel from staying exposed.
 stop:
     #!/usr/bin/env bash
     pkill -f "next dev"            2>/dev/null && echo "✓ stopped Next.js"     || echo "  Next.js not running"
