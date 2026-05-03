@@ -102,9 +102,12 @@ status:
 reset:
     supabase db reset
 
-# Stop Next.js + ngrok + Supabase. Docker Desktop stays up.
+# Stop Next.js + tunnels (ngrok + cloudflared) + Supabase. Docker Desktop stays up.
+# Always run this when you're done with a session — leaving the Supabase
+# tunnel exposed lets strangers hit the REST API with the anon key.
 stop:
     #!/usr/bin/env bash
-    pkill -f "next dev"   2>/dev/null && echo "✓ stopped Next.js" || echo "  Next.js not running"
-    pkill -f "ngrok start" 2>/dev/null && echo "✓ stopped ngrok"   || echo "  ngrok not running"
-    supabase stop 2>/dev/null && echo "✓ stopped Supabase"          || echo "  Supabase not running"
+    pkill -f "next dev"            2>/dev/null && echo "✓ stopped Next.js"     || echo "  Next.js not running"
+    pkill -f "ngrok start"         2>/dev/null && echo "✓ stopped ngrok"       || echo "  ngrok not running"
+    pkill -f "cloudflared tunnel"  2>/dev/null && echo "✓ stopped cloudflared" || echo "  cloudflared not running"
+    supabase stop                  2>/dev/null && echo "✓ stopped Supabase"    || echo "  Supabase not running"
