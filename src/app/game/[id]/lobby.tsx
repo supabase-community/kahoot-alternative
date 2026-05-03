@@ -93,18 +93,32 @@ function Register({
     setSending(true)
 
     if (!nickname) {
+      setSending(false)
       return
     }
-    const { data: participant, error } = await supabase
-      .from('participants')
-      .insert({ nickname, game_id: gameId })
-      .select()
-      .single()
 
-    if (error) {
+    const tryInsert = async () =>
+      supabase
+        .from('participants')
+        .insert({ nickname, game_id: gameId })
+        .select()
+        .single()
+
+    let { data: participant, error } = await tryInsert()
+
+    // 23503 = FK violation on participants.user_id (stale anon JWT pointing
+    // at a user that no longer exists in auth.users — happens after a
+    // `supabase db reset` between cohorts, or any time we wiped users). Sign
+    // out, mint a fresh anon user, retry once.
+    if (error && (error as any).code === '23503') {
+      await supabase.auth.signOut()
+      await supabase.auth.signInAnonymously()
+      ;({ data: participant, error } = await tryInsert())
+    }
+
+    if (error || !participant) {
       setSending(false)
-
-      return alert(error.message)
+      return alert(error?.message ?? 'Could not join the game')
     }
 
     onRegisterCompleted(participant)
