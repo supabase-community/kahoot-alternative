@@ -22,28 +22,35 @@ export default function Home() {
   }, [])
 
   const startGame = async (quizSetId: string) => {
-    const { data: sessionData, error: sessionError } =
-      await supabase.auth.getSession()
+    const tryInsert = async () =>
+      supabase.from('games').insert({ quiz_set_id: quizSetId }).select().single()
 
-    if (!sessionData.session) {
-      await supabase.auth.signInAnonymously()
+    const ensureSession = async () => {
+      const { data: sessionData } = await supabase.auth.getSession()
+      if (!sessionData.session) {
+        await supabase.auth.signInAnonymously()
+      }
     }
 
-    const { data, error } = await supabase
-      .from('games')
-      .insert({
-        quiz_set_id: quizSetId,
-      })
-      .select()
-      .single()
-    if (error) {
+    await ensureSession()
+    let { data, error } = await tryInsert()
+
+    // 23503 = foreign-key violation on games.host_user_id (stale JWT for a user
+    // that no longer exists, e.g. after `supabase db reset`). Sign out, get a
+    // fresh anon user, retry once.
+    if (error && (error as any).code === '23503') {
+      await supabase.auth.signOut()
+      await supabase.auth.signInAnonymously()
+      ;({ data, error } = await tryInsert())
+    }
+
+    if (error || !data) {
       console.error(error)
-      alert('Failed to start game')
+      alert(`Failed to start game: ${error?.message ?? 'unknown'}`)
       return
     }
 
-    const gameId = data.id
-    window.open(`/host/game/${gameId}`, '_blank', 'noopener,noreferrer')
+    window.open(`/host/game/${data.id}`, '_blank', 'noopener,noreferrer')
   }
 
   return (

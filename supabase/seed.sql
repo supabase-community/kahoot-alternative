@@ -1,802 +1,373 @@
--- insert english quiz for GA week
-insert into public.quiz_sets
-    (id, name, description)
-    values ('bb2ddb95-f632-48bd-a042-eb07b3f7ef8d', 'GA Week Supabase Meetup Quiz', 'A quiz for the Supabase Meetup');
+-- ============================================================================
+-- HackYourFuture Data Track — Week 1 Quiz
+-- ============================================================================
+-- 26 multiple-choice questions covering chapters 1-9 of Week 1 (Python
+-- Foundations). Authored from the `## 🧠 Knowledge Check` sections of each
+-- chapter. Run order matches the curriculum so the quiz doubles as a recap.
+--
+-- To regenerate the database from this seed:
+--     supabase db reset
+-- ============================================================================
+
+insert into public.quiz_sets (id, name, description) values (
+    'aaaaaaaa-bbbb-cccc-dddd-000000000001',
+    'HYF Data Track — Week 1: Python Foundations',
+    '26 multiple-choice questions covering chapters 1-9 (Python setup, data types, control flow, functions/modules, type hints, CLI habits, errors/debugging, logging, file operations).'
+);
 
 
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'What was the original name of the programming language JavaScript?'::text,
-    "order" => 0,
-    choices => array[
-      '{"body": "Mocha", "is_correct": true}'::json,
-      '{"body": "LiveScript", "is_correct": false}'::json,
-      '{"body": "ECMAScript", "is_correct": false}'::json,
-      '{"body": "JScript", "is_correct": false}'::json
+-- ----------------------------------------------------------------------------
+-- Ch1: Python Setup
+-- ----------------------------------------------------------------------------
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Why use a virtual environment (venv) for each Python project?',
+    "order"     => 0,
+    choices     => array[
+        '{"body": "So different projects can pin different package versions without conflicts", "is_correct": true}'::json,
+        '{"body": "To make Python run faster", "is_correct": false}'::json,
+        '{"body": "To save disk space", "is_correct": false}'::json,
+        '{"body": "Because Python refuses to run scripts outside a venv", "is_correct": false}'::json
     ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'What does the acronym “API” stand for in the context of software development?'::text,
-    "order" => 1,
-    choices => array[
-      '{"body": "Application Programming Interface", "is_correct": true}'::json,
-      '{"body": "Automated Programming Instructions", "is_correct": false}'::json,
-      '{"body": "Advanced Program Integration", "is_correct": false}'::json,
-      '{"body": "Algorithmic Programming Interface", "is_correct": false}'::json
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'What does `source venv/bin/activate` actually do?',
+    "order"     => 1,
+    choices     => array[
+        '{"body": "Installs the packages from requirements.txt", "is_correct": false}'::json,
+        '{"body": "Updates Python to the latest version", "is_correct": false}'::json,
+        '{"body": "Points your shell at the venv\u2019s Python and packages instead of the system ones", "is_correct": true}'::json,
+        '{"body": "Permanently changes your default Python interpreter", "is_correct": false}'::json
     ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'How many GitHub stars does the main supabase repo have?'::text,
-    "order" => 2,
-    choices => array[
-      '{"body": "45k", "is_correct": false}'::json,
-      '{"body": "55k", "is_correct": false}'::json,
-      '{"body": "65k", "is_correct": true}'::json,
-      '{"body": "75k", "is_correct": false}'::json
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'You see `ModuleNotFoundError: pandas` even though `pip install pandas` succeeded. Most likely fix?',
+    "order"     => 2,
+    choices     => array[
+        '{"body": "Reinstall Python", "is_correct": false}'::json,
+        '{"body": "Run `Python: Select Interpreter` in VS Code and pick the one inside your venv", "is_correct": true}'::json,
+        '{"body": "`pip install --force-reinstall pandas`", "is_correct": false}'::json,
+        '{"body": "Restart your computer", "is_correct": false}'::json
     ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'According to the Stack Overflow Survey 2022 what is the most popular database language amongst respondents?'::text,
-    "order" => 3,
-    choices => array[
-      '{"body": "PostgreSQL", "is_correct": true}'::json,
-      '{"body": "MySQL", "is_correct": false}'::json,
-      '{"body": "Microsoft SQL Server", "is_correct": false}'::json,
-      '{"body": "Excel", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'How many lines of code are there in Windows 10?'::text,
-    "order" => 4,
-    choices => array[
-      '{"body": "500,000", "is_correct": false}'::json,
-      '{"body": "5 million", "is_correct": false}'::json,
-      '{"body": "50 million", "is_correct": true}'::json,
-      '{"body": "500 million", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'What year was TypeScript released to the public?'::text,
-    "order" => 5,
-    choices => array[
-      '{"body": "2001", "is_correct": false}'::json,
-      '{"body": "2009", "is_correct": false}'::json,
-      '{"body": "2012", "is_correct": true}'::json,
-      '{"body": "2018", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'Which Supabase client library has the most usage across all projects?'::text,
-    "order" => 6,
-    choices => array[
-      '{"body": "Python", "is_correct": false}'::json,
-      '{"body": "Flutter", "is_correct": false}'::json,
-      '{"body": "Javascript", "is_correct": true}'::json,
-      '{"body": "SSR", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'Where is the company that builds the Opera Browser headquartered?'::text,
-    "order" => 7,
-    choices => array[
-      '{"body": "Denmark", "is_correct": false}'::json,
-      '{"body": "Norway", "is_correct": true}'::json,
-      '{"body": "Singapore", "is_correct": false}'::json,
-      '{"body": "Kenya", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'Who is the original author of React?'::text,
-    "order" => 8,
-    choices => array[
-      '{"body": "Steve Jobs", "is_correct": false}'::json,
-      '{"body": "Jordan Walke", "is_correct": true}'::json,
-      '{"body": "Dan Abramov", "is_correct": false}'::json,
-      '{"body": "Guido van Rossum", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'bb2ddb95-f632-48bd-a042-eb07b3f7ef8d'::uuid,
-    body => 'In ASCII what is the binary representation of an upper case W?'::text,
-    "order" => 9,
-    choices => array[
-      '{"body": "01010111", "is_correct": true}'::json,
-      '{"body": "11010111", "is_correct": false}'::json,
-      '{"body": "01000111", "is_correct": false}'::json,
-      '{"body": "01010101", "is_correct": false}'::json
-    ]
-  );
+);
 
 
--- insert Spanish quiz for GA week
-insert into public.quiz_sets
-    (id, name, description)
-    values ('9a525135-cd91-4372-9171-02fc57c6713a', 'GA Week Supabase Meetup Quiz Español', 'Un cuestionario para el Supabase Meetup');
+-- ----------------------------------------------------------------------------
+-- Ch2: Data Types and Variables
+-- ----------------------------------------------------------------------------
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'After `a = [1, 2]; b = a; b.append(3)`, what is `a`?',
+    "order"     => 3,
+    choices     => array[
+        '{"body": "[1, 2] — only `b` was modified", "is_correct": false}'::json,
+        '{"body": "[1, 2, 3] — `b = a` makes both names point at the same list object", "is_correct": true}'::json,
+        '{"body": "[3] — append replaces the list", "is_correct": false}'::json,
+        '{"body": "Raises a TypeError", "is_correct": false}'::json
+    ]
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Why is `0.1 + 0.2 == 0.3` False in Python?',
+    "order"     => 4,
+    choices     => array[
+        '{"body": "It is a Python bug from 1991 nobody has fixed", "is_correct": false}'::json,
+        '{"body": "Floats are stored in binary; 0.1 and 0.2 cannot be represented exactly, so the sum is slightly off", "is_correct": true}'::json,
+        '{"body": "`==` does not work on floats; you must use `is`", "is_correct": false}'::json,
+        '{"body": "Python rounds all decimals to integers internally", "is_correct": false}'::json
+    ]
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Which of these is a valid Python variable name?',
+    "order"     => 5,
+    choices     => array[
+        '{"body": "user_count", "is_correct": true}'::json,
+        '{"body": "user-count", "is_correct": false}'::json,
+        '{"body": "2users", "is_correct": false}'::json,
+        '{"body": "class", "is_correct": false}'::json
+    ]
+);
 
 
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿Cuál es el nombre original de JavaScript? '::text,
-    "order" => 0,
-    choices => array[
-      '{"body": "Mocha", "is_correct": true}'::json,
-      '{"body": "LiveScript", "is_correct": false}'::json,
-      '{"body": "ECMAScript", "is_correct": false}'::json,
-      '{"body": "JScript", "is_correct": false}'::json
+-- ----------------------------------------------------------------------------
+-- Ch3: Control Flow
+-- ----------------------------------------------------------------------------
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'What is the truthiness of an empty list `[]` in Python?',
+    "order"     => 6,
+    choices     => array[
+        '{"body": "True — every list is truthy", "is_correct": false}'::json,
+        '{"body": "False", "is_correct": true}'::json,
+        '{"body": "None", "is_correct": false}'::json,
+        '{"body": "Raises a ValueError", "is_correct": false}'::json
     ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿Qué significa API en el contexto de desarrollo de software? '::text,
-    "order" => 1,
-    choices => array[
-      '{"body": "Application Programming Interface", "is_correct": true}'::json,
-      '{"body": "Automated Programming Instructions", "is_correct": false}'::json,
-      '{"body": "Advanced Program Integration", "is_correct": false}'::json,
-      '{"body": "Algorithmic Programming Interface", "is_correct": false}'::json
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'What is the difference between `break` and `continue`?',
+    "order"     => 7,
+    choices     => array[
+        '{"body": "`break` exits the loop entirely; `continue` skips the rest of this iteration and moves to the next one", "is_correct": true}'::json,
+        '{"body": "They are aliases for the same behaviour", "is_correct": false}'::json,
+        '{"body": "`break` works in `for`, `continue` works in `while`", "is_correct": false}'::json,
+        '{"body": "`continue` exits the loop; `break` skips to the next iteration", "is_correct": false}'::json
     ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿Cuántas estrellas tiene el repositorio principal de Supabase? '::text,
-    "order" => 2,
-    choices => array[
-      '{"body": "45k", "is_correct": false}'::json,
-      '{"body": "55k", "is_correct": false}'::json,
-      '{"body": "65k", "is_correct": true}'::json,
-      '{"body": "75k", "is_correct": false}'::json
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Rewrite as a list comprehension: `squared = []; for x in range(5): squared.append(x**2)`',
+    "order"     => 8,
+    choices     => array[
+        '{"body": "squared = [x**2 for x in range(5)]", "is_correct": true}'::json,
+        '{"body": "squared = list(range(5)**2)", "is_correct": false}'::json,
+        '{"body": "squared = [for x in range(5): x**2]", "is_correct": false}'::json,
+        '{"body": "squared = map(x**2, range(5))", "is_correct": false}'::json
     ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿Cuál es el lenguaje más popular para bases de datos según la encuesta de Stack Overflow del 2023? '::text,
-    "order" => 3,
-    choices => array[
-      '{"body": "PostgreSQL", "is_correct": true}'::json,
-      '{"body": "MySQL", "is_correct": false}'::json,
-      '{"body": "Microsoft SQL Server", "is_correct": false}'::json,
-      '{"body": "Excel", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿Cuántas líneas de código hay en total en Windows 10?'::text,
-    "order" => 4,
-    choices => array[
-      '{"body": "500,000", "is_correct": false}'::json,
-      '{"body": "5 millones", "is_correct": false}'::json,
-      '{"body": "50 millones", "is_correct": true}'::json,
-      '{"body": "500 millones", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿En qué año fue publicado TypeScript? '::text,
-    "order" => 5,
-    choices => array[
-      '{"body": "2001", "is_correct": false}'::json,
-      '{"body": "2009", "is_correct": false}'::json,
-      '{"body": "2012", "is_correct": true}'::json,
-      '{"body": "2018", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿Cuál libreria de clientes (client library) de Supabase se utiliza más?'::text,
-    "order" => 6,
-    choices => array[
-      '{"body": "Python", "is_correct": false}'::json,
-      '{"body": "Flutter", "is_correct": false}'::json,
-      '{"body": "Javascript", "is_correct": true}'::json,
-      '{"body": "SSR", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿Dónde se encuentra la oficina principal de Opera Browser?'::text,
-    "order" => 7,
-    choices => array[
-      '{"body": "Dinamarca", "is_correct": false}'::json,
-      '{"body": "Noruega", "is_correct": true}'::json,
-      '{"body": "Singapur", "is_correct": false}'::json,
-      '{"body": "Kenia", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => '¿Quién es el autor original de React?'::text,
-    "order" => 8,
-    choices => array[
-      '{"body": "Steve Jobs", "is_correct": false}'::json,
-      '{"body": "Jordan Walke", "is_correct": true}'::json,
-      '{"body": "Dan Abramov", "is_correct": false}'::json,
-      '{"body": "Guido van Rossum", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '9a525135-cd91-4372-9171-02fc57c6713a'::uuid,
-    body => 'En código ASCII ¿Cuál es la representación binaria de la letra W mayúscula? '::text,
-    "order" => 9,
-    choices => array[
-      '{"body": "01010111", "is_correct": true}'::json,
-      '{"body": "11010111", "is_correct": false}'::json,
-      '{"body": "01000111", "is_correct": false}'::json,
-      '{"body": "01010101", "is_correct": false}'::json
-    ]
-  );
+);
 
 
--- insert Japanese quiz for GA week
-insert into public.quiz_sets
-    (id, name, description)
-    values ('ac8483a1-fb60-4d65-b898-58f830bbabdd', 'GA Week Supabase Meetup Quiz 日本語', 'A quiz for the Supabase Meetup in Japanese');
+-- ----------------------------------------------------------------------------
+-- Ch4: Functions and Modules
+-- ----------------------------------------------------------------------------
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'What does `if __name__ == "__main__":` allow a single .py file to do?',
+    "order"     => 9,
+    choices     => array[
+        '{"body": "Skip the import system entirely", "is_correct": false}'::json,
+        '{"body": "Be both an importable module AND a runnable script — code in the block runs only when the file is executed directly", "is_correct": true}'::json,
+        '{"body": "Run faster than a normal script", "is_correct": false}'::json,
+        '{"body": "Catch all uncaught exceptions", "is_correct": false}'::json
+    ]
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Why is `def add_record(records=[]):` a footgun?',
+    "order"     => 10,
+    choices     => array[
+        '{"body": "Lists are slow as default values", "is_correct": false}'::json,
+        '{"body": "The default `[]` is created once at function-definition time and shared between calls — state accumulates across invocations", "is_correct": true}'::json,
+        '{"body": "Python forbids list defaults", "is_correct": false}'::json,
+        '{"body": "It silently drops records", "is_correct": false}'::json
+    ]
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'You have `utils.py` with a function `clean()`. Which two ways correctly import and use it from `main.py`?',
+    "order"     => 11,
+    choices     => array[
+        '{"body": "`from utils import clean` (then `clean()`) and `import utils` (then `utils.clean()`)", "is_correct": true}'::json,
+        '{"body": "`include ''utils.clean''` and `require utils.clean`", "is_correct": false}'::json,
+        '{"body": "Only `import utils`; `from` does not exist in Python", "is_correct": false}'::json,
+        '{"body": "`using utils.clean` and `with utils.clean()`", "is_correct": false}'::json
+    ]
+);
 
 
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => 'プログラミング言語JavaScriptが最初作られた時の名前は？'::text,
-    "order" => 0,
-    choices => array[
-      '{"body": "Mocha", "is_correct": true}'::json,
-      '{"body": "LiveScript", "is_correct": false}'::json,
-      '{"body": "ECMAScript", "is_correct": false}'::json,
-      '{"body": "JScript", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => '「API」は何の略？'::text,
-    "order" => 1,
-    choices => array[
-      '{"body": "Application Programming Interface", "is_correct": true}'::json,
-      '{"body": "Automated Programming Instructions", "is_correct": false}'::json,
-      '{"body": "Advanced Program Integration", "is_correct": false}'::json,
-      '{"body": "Algorithmic Programming Interface", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => '今現在SupabaseのメインGitHubレポジトリーには何個スターがついている？'::text,
-    "order" => 2,
-    choices => array[
-      '{"body": "45k", "is_correct": false}'::json,
-      '{"body": "55k", "is_correct": false}'::json,
-      '{"body": "65k", "is_correct": true}'::json,
-      '{"body": "75k", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => '2023年のStack Overflowアンケートで一番人気なデータベースは何？'::text,
-    "order" => 3,
-    choices => array[
-      '{"body": "PostgreSQL", "is_correct": true}'::json,
-      '{"body": "MySQL", "is_correct": false}'::json,
-      '{"body": "Microsoft SQL Server", "is_correct": false}'::json,
-      '{"body": "Excel", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => 'Windows 10のソースコードは何行？'::text,
-    "order" => 4,
-    choices => array[
-      '{"body": "50万行", "is_correct": false}'::json,
-      '{"body": "500万行", "is_correct": false}'::json,
-      '{"body": "5,000万行", "is_correct": true}'::json,
-      '{"body": "5億行", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => 'TypeScriptがリリースされたのは何年？'::text,
-    "order" => 5,
-    choices => array[
-      '{"body": "2001年", "is_correct": false}'::json,
-      '{"body": "2009年", "is_correct": false}'::json,
-      '{"body": "2012年", "is_correct": true}'::json,
-      '{"body": "2018年", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => '一番使われているSupabaseのクライアントライブラリーはどれ？'::text,
-    "order" => 6,
-    choices => array[
-      '{"body": "Python", "is_correct": false}'::json,
-      '{"body": "Flutter", "is_correct": false}'::json,
-      '{"body": "Javascript", "is_correct": true}'::json,
-      '{"body": "SSR", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => 'Operaブラウザを作っている会社の本社があるのはどこ？'::text,
-    "order" => 7,
-    choices => array[
-      '{"body": "デンマーク", "is_correct": false}'::json,
-      '{"body": "ノルウェー", "is_correct": true}'::json,
-      '{"body": "シンガポール", "is_correct": false}'::json,
-      '{"body": "ケニア", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => 'Reactを最初に作ったのは誰？'::text,
-    "order" => 8,
-    choices => array[
-      '{"body": "Steve Jobs", "is_correct": false}'::json,
-      '{"body": "Jordan Walke", "is_correct": true}'::json,
-      '{"body": "Dan Abramov", "is_correct": false}'::json,
-      '{"body": "Guido van Rossum", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => 'ac8483a1-fb60-4d65-b898-58f830bbabdd'::uuid,
-    body => 'ASCIIで、大文字のWを2進数で正しく表しているのはどれ？'::text,
-    "order" => 9,
-    choices => array[
-      '{"body": "01010111", "is_correct": true}'::json,
-      '{"body": "11010111", "is_correct": false}'::json,
-      '{"body": "01000111", "is_correct": false}'::json,
-      '{"body": "01010101", "is_correct": false}'::json
-    ]
-  );
+-- ----------------------------------------------------------------------------
+-- Ch5: Type Hints
+-- ----------------------------------------------------------------------------
 
--- insert Portuguese quiz for GA week
-insert into public.quiz_sets
-    (id, name, description)
-    values ('0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab', 'Supabase Meetup Quiz Português', 'A quiz for the Supabase Meetup in Português');
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Do Python type hints prevent you from passing the wrong type at runtime?',
+    "order"     => 12,
+    choices     => array[
+        '{"body": "Yes — Python raises TypeError when the call does not match the hint", "is_correct": false}'::json,
+        '{"body": "Yes — the program will not even start", "is_correct": false}'::json,
+        '{"body": "No — hints are advisory; tools like mypy and Pylance flag mismatches in the editor, but the Python interpreter ignores them at runtime", "is_correct": true}'::json,
+        '{"body": "Only when running `python --strict`", "is_correct": false}'::json
+    ]
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'How do you annotate a parameter that is either a `str` or `None` (Python 3.10+ form)?',
+    "order"     => 13,
+    choices     => array[
+        '{"body": "x: str | None", "is_correct": true}'::json,
+        '{"body": "x: str?", "is_correct": false}'::json,
+        '{"body": "x: Maybe[str]", "is_correct": false}'::json,
+        '{"body": "x: NullableString", "is_correct": false}'::json
+    ]
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'What does `Callable[[int, int], int]` describe?',
+    "order"     => 14,
+    choices     => array[
+        '{"body": "A list of integers", "is_correct": false}'::json,
+        '{"body": "A function that takes two `int` arguments and returns an `int`", "is_correct": true}'::json,
+        '{"body": "An integer generator", "is_correct": false}'::json,
+        '{"body": "A class with two int attributes", "is_correct": false}'::json
+    ]
+);
 
 
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'Qual é o nome original de JavaScript?'::text,
-    "order" => 0,
-    choices => array[
-      '{"body": "Mocha", "is_correct": true}'::json,
-      '{"body": "LiveScript", "is_correct": false}'::json,
-      '{"body": "ECMAScript", "is_correct": false}'::json,
-      '{"body": "JScript", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'Qual o sigificado da sigla API?'::text,
-    "order" => 1,
-    choices => array[
-      '{"body": "Application Programming Interface", "is_correct": true}'::json,
-      '{"body": "Automated Programming Instructions", "is_correct": false}'::json,
-      '{"body": "Advanced Program Integration", "is_correct": false}'::json,
-      '{"body": "Algorithmic Programming Interface", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'Quantas estrelas tem o repositório da Supabase?'::text,
-    "order" => 2,
-    choices => array[
-      '{"body": "45k", "is_correct": false}'::json,
-      '{"body": "55k", "is_correct": false}'::json,
-      '{"body": "65k", "is_correct": true}'::json,
-      '{"body": "75k", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'De acordo com a pesquisa do Stack Overflow em 2023 qual é o banco de dados mais popular?'::text,
-    "order" => 3,
-    choices => array[
-      '{"body": "PostgreSQL", "is_correct": true}'::json,
-      '{"body": "MySQL", "is_correct": false}'::json,
-      '{"body": "Microsoft SQL Server", "is_correct": false}'::json,
-      '{"body": "Excel", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'Quantas linhas de código existe no Windows 10?'::text,
-    "order" => 4,
-    choices => array[
-      '{"body": "500,000", "is_correct": false}'::json,
-      '{"body": "5 million", "is_correct": false}'::json,
-      '{"body": "50 million", "is_correct": true}'::json,
-      '{"body": "500 million", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'Em que ano foi publicado TypeScript? '::text,
-    "order" => 5,
-    choices => array[
-      '{"body": "2001", "is_correct": false}'::json,
-      '{"body": "2009", "is_correct": false}'::json,
-      '{"body": "2012", "is_correct": true}'::json,
-      '{"body": "2018", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'Qual é a biblioteca mais usada de Supabase entre todos os projetos?'::text,
-    "order" => 6,
-    choices => array[
-      '{"body": "Python", "is_correct": false}'::json,
-      '{"body": "Flutter", "is_correct": false}'::json,
-      '{"body": "Javascript", "is_correct": true}'::json,
-      '{"body": "SSR", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'Onde está escritório principal do Opera Browser?'::text,
-    "order" => 7,
-    choices => array[
-      '{"body": "Dinamarca", "is_correct": false}'::json,
-      '{"body": "Noruega", "is_correct": true}'::json,
-      '{"body": "Singapura", "is_correct": false}'::json,
-      '{"body": "Quénia", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => '¿Quem é o autor original do framework React? '::text,
-    "order" => 8,
-    choices => array[
-      '{"body": "Steve Jobs", "is_correct": false}'::json,
-      '{"body": "Jordan Walke", "is_correct": true}'::json,
-      '{"body": "Dan Abramov", "is_correct": false}'::json,
-      '{"body": "Guido van Rossum", "is_correct": false}'::json
-    ]
-  );
-select
-  add_question (
-    quiz_set_id => '0c9f0d6d-7659-4f2d-a258-cafe6b74c9ab'::uuid,
-    body => 'Em código ASCII, como é a representação binária da letra W maiuscula?'::text,
-    "order" => 9,
-    choices => array[
-      '{"body": "01010111", "is_correct": true}'::json,
-      '{"body": "11010111", "is_correct": false}'::json,
-      '{"body": "01000111", "is_correct": false}'::json,
-      '{"body": "01010101", "is_correct": false}'::json
-    ]
-  );
+-- ----------------------------------------------------------------------------
+-- Ch6: CLI Habits
+-- ----------------------------------------------------------------------------
 
--- Insert LW12 quiz
-insert into public.quiz_sets
-    (id, name, description)
-    values ('ae53ca2c-c7f4-4b31-8b71-51fab618a74f', 'LW12 Meetup Quiz', 'A quiz for the LW12 Supabase Meetup');
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Why is `input()` (asking the user to type) a bad fit for automated data pipelines?',
+    "order"     => 15,
+    choices     => array[
+        '{"body": "It is slow", "is_correct": false}'::json,
+        '{"body": "Pipelines run unattended (cron, Airflow); `input()` blocks forever waiting for a keystroke nobody will type", "is_correct": true}'::json,
+        '{"body": "`input()` is deprecated in Python 3", "is_correct": false}'::json,
+        '{"body": "It returns bytes instead of a string", "is_correct": false}'::json
+    ]
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'What does an exit code of `0` signal to the operating system?',
+    "order"     => 16,
+    choices     => array[
+        '{"body": "The program is starting", "is_correct": false}'::json,
+        '{"body": "Success — `0` means \"no error\"; any non-zero value signals a failure of some kind", "is_correct": true}'::json,
+        '{"body": "Out of memory", "is_correct": false}'::json,
+        '{"body": "The user cancelled the run", "is_correct": false}'::json
+    ]
+);
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'What does `argparse` give you for free?',
+    "order"     => 17,
+    choices     => array[
+        '{"body": "Faster Python startup", "is_correct": false}'::json,
+        '{"body": "Auto-generated `--help`, named flags, type validation, and clear errors when the user passes garbage", "is_correct": true}'::json,
+        '{"body": "Encryption of CLI arguments", "is_correct": false}'::json,
+        '{"body": "Logging by default", "is_correct": false}'::json
+    ]
+);
 
 
-select
-  add_question (
-    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
-    body => 'What was the launch on day 1 of LW12?'::text,
-    "order" => 0,
-    choices => array[
-      '{"body": "VS Code extension", "is_correct": true}'::json,
-      '{"body": "Supabase goes GA", "is_correct": false}'::json,
-      '{"body": "postgres.new", "is_correct": true}'::json,
-      '{"body": "anonymous sign-in", "is_correct": false}'::json
+-- ----------------------------------------------------------------------------
+-- Ch7: Errors and Debugging
+-- ----------------------------------------------------------------------------
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'What is the difference between a `SyntaxError` and a runtime exception?',
+    "order"     => 18,
+    choices     => array[
+        '{"body": "SyntaxError happens before any code runs (the parser rejects the file); runtime exceptions happen mid-execution", "is_correct": true}'::json,
+        '{"body": "They are synonyms", "is_correct": false}'::json,
+        '{"body": "SyntaxError is a warning; runtime exceptions are fatal", "is_correct": false}'::json,
+        '{"body": "Only runtime exceptions can be caught with try/except", "is_correct": false}'::json
     ]
-  );
+);
 
-select
-  add_question (
-    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
-    body => 'How many GitHub stars does the main supabase repo have?'::text,
-    "order" => 1,
-    choices => array[
-      '{"body": "40k", "is_correct": false}'::json,
-      '{"body": "50k", "is_correct": false}'::json,
-      '{"body": "60k", "is_correct": false}'::json,
-      '{"body": "70k", "is_correct": true}'::json
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'In a Python traceback, where do you look first to understand what went wrong?',
+    "order"     => 19,
+    choices     => array[
+        '{"body": "The first line — that is where the error originated", "is_correct": false}'::json,
+        '{"body": "The bottom — the last line names the exception type and message; the line above it points at where it happened", "is_correct": true}'::json,
+        '{"body": "The middle — the deepest frame", "is_correct": false}'::json,
+        '{"body": "Tracebacks are illegible; rerun with `--verbose`", "is_correct": false}'::json
     ]
-  );
+);
 
-select
-  add_question (
-    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
-    body => 'According to the 2023 Stack Overflow developer survey, what is the most popular database?'::text,
-    "order" => 2,
-    choices => array[
-      '{"body": "MySQL", "is_correct": false}'::json,
-      '{"body": "Postgres", "is_correct": true}'::json,
-      '{"body": "Excel", "is_correct": false}'::json,
-      '{"body": "Microsoft SQL Server", "is_correct": false}'::json
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'In the VS Code debugger you are paused on a line that calls a function. You want to walk through that function''s body. Which button?',
+    "order"     => 20,
+    choices     => array[
+        '{"body": "Step Over — skips the function and moves to the next line in the current frame", "is_correct": false}'::json,
+        '{"body": "Step Into — descends into the function so you can step through its body line-by-line", "is_correct": true}'::json,
+        '{"body": "Continue — runs to the next breakpoint", "is_correct": false}'::json,
+        '{"body": "Restart", "is_correct": false}'::json
     ]
-  );
+);
 
-select
-  add_question (
-    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
-    body => 'Which product was the first product offered by Supabase?'::text,
-    "order" => 3,
-    choices => array[
-      '{"body": "Auto generated APIs", "is_correct": false}'::json,
-      '{"body": "Realtime", "is_correct": true}'::json,
-      '{"body": "Auth", "is_correct": false}'::json,
-      '{"body": "Storage", "is_correct": false}'::json
+
+-- ----------------------------------------------------------------------------
+-- Ch8: Logging
+-- ----------------------------------------------------------------------------
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Why use the `logging` module instead of `print()` in a production script?',
+    "order"     => 21,
+    choices     => array[
+        '{"body": "Logging is faster than print", "is_correct": false}'::json,
+        '{"body": "Logging gives you levels (DEBUG/INFO/WARNING/ERROR), timestamps, per-module filters, and configurable output destinations; print is one dumb stream", "is_correct": true}'::json,
+        '{"body": "`print` was deprecated in Python 3.10", "is_correct": false}'::json,
+        '{"body": "Logging encrypts the output", "is_correct": false}'::json
     ]
-  );
+);
 
-select
-  add_question (
-    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
-    body => 'Which of the following client libraries is currently maintained by the community?'::text,
-    "order" => 4,
-    choices => array[
-      '{"body": "JavaScript", "is_correct": false}'::json,
-      '{"body": "Flutter(Dart)", "is_correct": false}'::json,
-      '{"body": "Swift", "is_correct": false}'::json,
-      '{"body": "Kotlin", "is_correct": true}'::json
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Which logging level fits the message "User logged in successfully"?',
+    "order"     => 22,
+    choices     => array[
+        '{"body": "ERROR", "is_correct": false}'::json,
+        '{"body": "WARNING", "is_correct": false}'::json,
+        '{"body": "INFO", "is_correct": true}'::json,
+        '{"body": "CRITICAL", "is_correct": false}'::json
     ]
-  );
+);
 
-select
-  add_question (
-    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
-    body => 'How many different locations is the Supabase LW12 meetup being held at?'::text,
-    "order" => 5,
-    choices => array[
-      '{"body": "10 - 20", "is_correct": false}'::json,
-      '{"body": "20 - 30", "is_correct": false}'::json,
-      '{"body": "30 - 40", "is_correct": false}'::json,
-      '{"body": "Over 40", "is_correct": true}'::json
+
+-- ----------------------------------------------------------------------------
+-- Ch9: File Operations
+-- ----------------------------------------------------------------------------
+
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Why is `with open(...) as f:` safer than manually calling `open()` and `close()`?',
+    "order"     => 23,
+    choices     => array[
+        '{"body": "It is faster", "is_correct": false}'::json,
+        '{"body": "`with` always closes the file when the block exits, even if an exception is raised — manual close can leak handles when something errors mid-read", "is_correct": true}'::json,
+        '{"body": "It is the only way to read binary files", "is_correct": false}'::json,
+        '{"body": "Manual `close()` is deprecated in Python 3", "is_correct": false}'::json
     ]
-  );
+);
 
-select
-  add_question (
-    quiz_set_id => 'ae53ca2c-c7f4-4b31-8b71-51fab618a74f'::uuid,
-    body => 'What might you win when you create your LW12 ticket and share it on socials?'::text,
-    "order" => 6,
-    choices => array[
-      '{"body": "Supabase World Tour T-Shirt", "is_correct": true}'::json,
-      '{"body": "Mechanical Keyboard", "is_correct": false}'::json,
-      '{"body": "Supabase iPhone case", "is_correct": false}'::json,
-      '{"body": "Wandrd Backpack", "is_correct": true}'::json
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'You run `open("data.txt", "w")` on a file that already has content. What happens?',
+    "order"     => 24,
+    choices     => array[
+        '{"body": "Appends to the end", "is_correct": false}'::json,
+        '{"body": "Raises FileExistsError", "is_correct": false}'::json,
+        '{"body": "Truncates the file — wipes the existing contents and starts fresh", "is_correct": true}'::json,
+        '{"body": "Asks for confirmation", "is_correct": false}'::json
     ]
-  );
+);
 
-
--- lw14
-insert into public.quiz_sets
-    (id, name, description)
-    values ('8177fdea-a757-4939-9e0e-4b0e8e90dfb8', 'LW14 Meetup Quiz', 'A quiz for the LW14 Supabase Meetup');
-
-select
-  add_question (
-    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
-    body => 'According to the Stack Overflow Survey 2024 what is the most popular database language amongst respondents?'::text,
-    "order" => 0,
-    choices => array[
-      '{"body": "PostgreSQL", "is_correct": true}'::json,
-      '{"body": "MySQL", "is_correct": false}'::json,
-      '{"body": "Microsoft SQL Server", "is_correct": false}'::json,
-      '{"body": "Excel", "is_correct": false}'::json
+select add_question (
+    quiz_set_id => 'aaaaaaaa-bbbb-cccc-dddd-000000000001'::uuid,
+    body        => 'Why use `pathlib.Path("folder") / "file.txt"` instead of the string `"folder/file.txt"`?',
+    "order"     => 25,
+    choices     => array[
+        '{"body": "It is faster than string concatenation", "is_correct": false}'::json,
+        '{"body": "It uses the right separator on Windows (\\) vs macOS/Linux (/) automatically — your code stays portable without manual string-juggling", "is_correct": true}'::json,
+        '{"body": "Strings cannot represent file paths in Python 3", "is_correct": false}'::json,
+        '{"body": "`pathlib` paths are encrypted on disk", "is_correct": false}'::json
     ]
-  );
-
-select
-  add_question (
-    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
-    body => 'How many GitHub stars does the main supabase repo have?'::text,
-    "order" => 1,
-    choices => array[
-      '{"body": "50k", "is_correct": false}'::json,
-      '{"body": "60k", "is_correct": false}'::json,
-      '{"body": "70k", "is_correct": false}'::json,
-      '{"body": "80k", "is_correct": true}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
-    body => 'Which HTTP status code indicates that a resource was not found?'::text,
-    "order" => 2,
-    choices => array[
-      '{"body": "200", "is_correct": false}'::json,
-      '{"body": "301", "is_correct": false}'::json,
-      '{"body": "404", "is_correct": true}'::json,
-      '{"body": "500", "is_correct": false}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
-    body => 'What does the acronym "API" stand for in software development?'::text,
-    "order" => 3,
-    choices => array[
-      '{"body": "Application Programming Interface", "is_correct": true}'::json,
-      '{"body": "Advanced Programming Integration", "is_correct": false}'::json,
-      '{"body": "Automated Process Implementation", "is_correct": false}'::json,
-      '{"body": "Application Process Integration", "is_correct": false}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
-    body => 'Which of the following companies use Postgres database?'::text,
-    "order" => 4,
-    choices => array[
-      '{"body": "Reddit", "is_correct": true}'::json,
-      '{"body": "Notion", "is_correct": true}'::json,
-      '{"body": "Figma", "is_correct": true}'::json,
-      '{"body": "Twitch", "is_correct": true}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
-    body => 'MCP, a protocol for connecting AI assistants to other systems stands for'::text,
-    "order" => 5,
-    choices => array[
-      '{"body": "Model Context Programming", "is_correct": false}'::json,
-      '{"body": "Model Context Protocol", "is_correct": true}'::json,
-      '{"body": "Machine Communication Protocol", "is_correct": false}'::json,
-      '{"body": "Multi Context Protocol", "is_correct": false}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => '8177fdea-a757-4939-9e0e-4b0e8e90dfb8'::uuid,
-    body => 'What year was TypeScript released to the public?'::text,
-    "order" => 6,
-    choices => array[
-      '{"body": "2001", "is_correct": false}'::json,
-      '{"body": "2009", "is_correct": false}'::json,
-      '{"body": "2012", "is_correct": true}'::json,
-      '{"body": "2018", "is_correct": false}'::json
-    ]
-  );
-
-
-
--- lw15
-insert into public.quiz_sets
-    (id, name, description)
-    values ('d4526cc6-6124-48c2-9b59-25fdccfc8643', 'LW15 Meetup Quiz', 'A quiz for the LW15 Supabase Meetup');
-
-select
-  add_question (
-    quiz_set_id => 'd4526cc6-6124-48c2-9b59-25fdccfc8643'::uuid,
-    body => 'How many GitHub stars does the main supabase repo have?'::text,
-    "order" => 0,
-    choices => array[
-      '{"body": "55k", "is_correct": false}'::json,
-      '{"body": "65k", "is_correct": false}'::json,
-      '{"body": "75k", "is_correct": false}'::json,
-      '{"body": "85k", "is_correct": true}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => 'd4526cc6-6124-48c2-9b59-25fdccfc8643'::uuid,
-    body => 'According to the Stack Overflow Survey 2024 what is the most popular database language amongst respondents?'::text,
-    "order" => 1,
-    choices => array[
-      '{"body": "PostgreSQL", "is_correct": true}'::json,
-      '{"body": "MySQL", "is_correct": false}'::json,
-      '{"body": "Microsoft SQL Server", "is_correct": false}'::json,
-      '{"body": "Excel", "is_correct": false}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => 'd4526cc6-6124-48c2-9b59-25fdccfc8643'::uuid,
-    body => 'Which HTTP status code indicates that a resource was not found?'::text,
-    "order" => 2,
-    choices => array[
-      '{"body": "200", "is_correct": false}'::json,
-      '{"body": "301", "is_correct": false}'::json,
-      '{"body": "404", "is_correct": true}'::json,
-      '{"body": "500", "is_correct": false}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => 'd4526cc6-6124-48c2-9b59-25fdccfc8643'::uuid,
-    body => 'What does the acronym "API" stand for in software development?'::text,
-    "order" => 3,
-    choices => array[
-      '{"body": "Application Programming Interface", "is_correct": true}'::json,
-      '{"body": "Advanced Programming Integration", "is_correct": false}'::json,
-      '{"body": "Automated Process Implementation", "is_correct": false}'::json,
-      '{"body": "Application Process Integration", "is_correct": false}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => 'd4526cc6-6124-48c2-9b59-25fdccfc8643'::uuid,
-    body => 'Which of the following companies use Postgres database?'::text,
-    "order" => 4,
-    choices => array[
-      '{"body": "Reddit", "is_correct": true}'::json,
-      '{"body": "Notion", "is_correct": true}'::json,
-      '{"body": "Figma", "is_correct": true}'::json,
-      '{"body": "Twitch", "is_correct": true}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => 'd4526cc6-6124-48c2-9b59-25fdccfc8643'::uuid,
-    body => 'MCP, a protocol for connecting AI assistants to other systems stands for'::text,
-    "order" => 5,
-    choices => array[
-      '{"body": "Model Context Programming", "is_correct": false}'::json,
-      '{"body": "Model Context Protocol", "is_correct": true}'::json,
-      '{"body": "Machine Communication Protocol", "is_correct": false}'::json,
-      '{"body": "Multi Context Protocol", "is_correct": false}'::json
-    ]
-  );
-
-select
-  add_question (
-    quiz_set_id => 'd4526cc6-6124-48c2-9b59-25fdccfc8643'::uuid,
-    body => 'What year was TypeScript released to the public?'::text,
-    "order" => 6,
-    choices => array[
-      '{"body": "2001", "is_correct": false}'::json,
-      '{"body": "2009", "is_correct": false}'::json,
-      '{"body": "2012", "is_correct": true}'::json,
-      '{"body": "2018", "is_correct": false}'::json
-    ]
-  );
-
+);

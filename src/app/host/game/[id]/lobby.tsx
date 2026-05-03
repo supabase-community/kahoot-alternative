@@ -45,7 +45,7 @@ export default function Lobby({
         <div className="pl-4">
           {/* <img src="/qr.png" alt="QR code" /> */}
           <Canvas
-            text={`https://kahoot-alternative.vercel.app/game/${gameId}`}
+            text={`${typeof window !== 'undefined' ? window.location.origin : ''}/game/${gameId}`}
             options={{
               errorCorrectionLevel: 'M',
               margin: 3,
@@ -53,6 +53,9 @@ export default function Lobby({
               width: 400,
             }}
           />
+          <p className="text-white text-center mt-2 break-all text-sm">
+            {typeof window !== 'undefined' ? `${window.location.origin}/game/${gameId}` : ''}
+          </p>
         </div>
       </div>
     </div>
