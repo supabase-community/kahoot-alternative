@@ -19,11 +19,16 @@ export default function HostQA() {
   const [questions, setQuestions] = useState<Question[]>([])
   const [upvotes, setUpvotes] = useState<Upvote[]>([])
 
-  // Sign-in once so RLS policies that require auth.uid() (mark-answered) work.
+  // Sign-in once, then self-claim host privilege via the security-definer
+  // RPC. After this the current uid is enrolled in qa_hosts and can call
+  // host_mark_answered() to flip any question's answered flag. Visiting
+  // this URL grants the privilege — keep the URL private to the teacher.
   useEffect(() => {
     const init = async () => {
       const { data } = await supabase.auth.getSession()
       if (!data.session) await supabase.auth.signInAnonymously()
+      const { error } = await supabase.rpc('claim_qa_host' as any)
+      if (error) console.error('claim_qa_host failed:', error)
     }
     init()
   }, [])
@@ -67,10 +72,14 @@ export default function HostQA() {
   const totalUpvotes = upvotes.length
 
   const markAnswered = async (id: string, answered: boolean) => {
-    await supabase
-      .from('qa_questions' as any)
-      .update({ answered_at: answered ? null : new Date().toISOString() })
-      .eq('id', id)
+    // Goes through the security-definer RPC instead of a direct update so RLS
+    // can refuse student attempts to mark other students' questions answered
+    // (the current update policy scopes UPDATE to the author only).
+    const { error } = await supabase.rpc('host_mark_answered' as any, {
+      question_id: id,
+      mark_as_answered: !answered,
+    })
+    if (error) alert(`Could not update: ${error.message}`)
   }
 
   return (
