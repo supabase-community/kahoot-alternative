@@ -117,19 +117,46 @@ export default function Home({
         ></Quiz>
       )}
       {currentScreen == Screens.results && (
-        <Results participant={participant!}></Results>
+        <Results participant={participant!} gameId={gameId}></Results>
       )}
     </main>
   )
 }
 
-function Results({ participant }: { participant: Participant }) {
+function Results({ participant, gameId }: { participant: Participant; gameId: string }) {
+  const [winner, setWinner] = useState<{ participant_id: string; nickname: string; total_score: number } | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchWinner = async () => {
+      const { data } = await supabase
+        .from('game_results')
+        .select()
+        .eq('game_id', gameId)
+        .order('total_score', { ascending: false })
+        .limit(1)
+      setLoading(false)
+      if (data && data.length > 0) setWinner(data[0] as any)
+    }
+    fetchWinner()
+  }, [gameId])
+
   return (
-    <div className="flex justify-center items-center min-h-screen text-center">
-      <div className="p-8 bg-black text-white rounded-lg">
-        <h2 className="text-2xl pb-4">Hey {participant.nickname}！</h2>
-        <p>Thanks for playing 🎉</p>
-      </div>
+    <div className="flex flex-col justify-center items-center min-h-screen text-center px-4">
+      <p className="text-white/80 mb-2">Thanks for playing, {participant.nickname}!</p>
+      <h1 className="text-4xl font-bold text-white mb-8">🏆 Winner</h1>
+      {loading && <p className="text-white/70 italic">Calculating final scores…</p>}
+      {!loading && !winner && <p className="text-white/70 italic">No scores recorded.</p>}
+      {winner && (
+        <div className="bg-white text-black rounded-2xl px-8 py-10 shadow-2xl flex flex-col items-center max-w-md w-full">
+          <span className="text-7xl mb-2">🥇</span>
+          <span className="text-4xl font-bold mb-3 break-words">{winner.nickname}</span>
+          <span className="text-2xl font-bold">
+            {winner.total_score}
+            <span className="text-base ml-1 font-normal text-gray-500">pts</span>
+          </span>
+        </div>
+      )}
     </div>
   )
 }

@@ -130,18 +130,18 @@ export default function Home({
       {currentScreen == AdminScreens.lobby && (
         <Lobby participants={participants} gameId={gameId}></Lobby>
       )}
-      {currentScreen == AdminScreens.quiz && (
+      {currentScreen == AdminScreens.quiz && quizSet && (
         <Quiz
-          question={quizSet!.questions![currentQuestionSequence]}
-          questionCount={quizSet!.questions!.length}
+          question={quizSet.questions[currentQuestionSequence]}
+          questionCount={quizSet.questions.length}
           gameId={gameId}
           participants={participants}
         ></Quiz>
       )}
-      {currentScreen == AdminScreens.result && (
+      {currentScreen == AdminScreens.result && quizSet && (
         <Results
-          participants={participants!}
-          quizSet={quizSet!}
+          participants={participants}
+          quizSet={quizSet}
           gameId={gameId}
         ></Results>
       )}
