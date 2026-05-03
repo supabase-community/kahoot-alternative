@@ -90,24 +90,25 @@ open:
     if [ -z "${APP:-}" ]; then echo "ngrok not running — run \`just start\` first"; exit 1; fi
     open "$APP/host/dashboard"
 
-# Show current public tunnel URLs (ngrok if running, else cloudflared from /tmp/cf-*.log).
+# Print the SHAREABLE URLs (with the right path per service) for the
+# currently running tunnel set — ngrok if up, else cloudflared.
 urls:
     #!/usr/bin/env bash
     set -uo pipefail
     if curl -sf http://127.0.0.1:4040/api/tunnels >/dev/null 2>&1; then
-        echo "ngrok tunnels:"
-        curl -s http://127.0.0.1:4040/api/tunnels | python3 -c "import json, sys; [print(f\"  {t['name']:10}  {t['public_url']}\") for t in json.load(sys.stdin)['tunnels']]"
+        APP=$(curl -s http://127.0.0.1:4040/api/tunnels  | python3 -c "import json,sys;print(next((t['public_url'] for t in json.load(sys.stdin)['tunnels'] if t['name']=='app'), ''))")
+        QA=$(curl -s http://127.0.0.1:4040/api/tunnels   | python3 -c "import json,sys;print(next((t['public_url'] for t in json.load(sys.stdin)['tunnels'] if t['name']=='qa'),  ''))")
     elif pgrep -f "cloudflared tunnel" >/dev/null; then
-        echo "cloudflared tunnels:"
-        for log in /tmp/cf-app.log /tmp/cf-qa.log /tmp/cf-supabase.log; do
-            name=$(basename "$log" .log | sed 's/^cf-//')
-            url=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' "$log" 2>/dev/null | head -1)
-            [ -n "$url" ] && printf "  %-10s %s\n" "$name" "$url"
-        done
+        APP=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' /tmp/cf-app.log     2>/dev/null | head -1)
+        QA=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com'  /tmp/cf-qa.log      2>/dev/null | head -1)
     else
         echo "no tunnels running — \`just start\` (ngrok) or run cloudflared manually"
         exit 1
     fi
+    echo "Quiz host:        $APP/host/dashboard"
+    echo "Quiz player:      (from QR code in the host's lobby)"
+    [ -n "$QA" ] && echo "Q&A teacher:      $QA/host/qa"
+    [ -n "$QA" ] && echo "Q&A student:      $QA/qa"
 
 # One-line health check of every service.
 status:
