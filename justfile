@@ -124,6 +124,82 @@ status:
 reset:
     supabase db reset
 
+qa_worktree := "/Users/lasse/Documents/github/hyf/kahoot-alternative-qa"
+
+# Local-only test mode. Brings up Docker → Supabase → Next.js (both quiz on
+# 3000 AND Q&A on 3001) pointing at LOCAL Supabase. No public tunnels. Use
+# this when you just want to test on your laptop without exposing anything.
+local:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    # 1. Docker
+    if ! docker ps >/dev/null 2>&1; then
+        echo "→ starting Docker Desktop..."
+        open -a Docker
+        for i in {1..60}; do docker ps >/dev/null 2>&1 && break; sleep 1; done
+        docker ps >/dev/null 2>&1 || { echo "✗ Docker did not start"; exit 1; }
+    fi
+    echo "✓ Docker"
+
+    # 2. Supabase
+    if ! curl -sf http://127.0.0.1:54321/rest/v1/ -H "apikey: x" >/dev/null 2>&1; then
+        echo "→ starting Supabase..."
+        supabase start >/dev/null
+    fi
+    echo "✓ Supabase"
+
+    # 3. .env.local for both worktrees points at LOCAL Supabase (no tunnel)
+    ANON=$(supabase status -o env 2>/dev/null | grep '^ANON_KEY=' | cut -d= -f2- | tr -d '"')
+    NEW_ENV=$(printf 'NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321\nNEXT_PUBLIC_SUPABASE_ANON_KEY=%s\n' "$ANON")
+    ENV_CHANGED=0
+    for DIR in . "{{ qa_worktree }}"; do
+        if [ ! -f "$DIR/.env.local" ] || [ "$(cat "$DIR/.env.local" 2>/dev/null)" != "$NEW_ENV" ]; then
+            echo "$NEW_ENV" > "$DIR/.env.local"
+            ENV_CHANGED=1
+        fi
+    done
+    echo "✓ .env.local (local Supabase)"
+
+    # 4. Stop tunnels — local mode means NO public exposure
+    pkill -f "cloudflared tunnel" 2>/dev/null && echo "✓ stopped cloudflared (local mode)" || true
+    pkill -f "ngrok start"        2>/dev/null && echo "✓ stopped ngrok (local mode)"        || true
+
+    # 5. Restart Next.js (both) if env changed or not running
+    if [ "$ENV_CHANGED" = "1" ] || ! curl -sf http://localhost:3000 >/dev/null 2>&1 || ! curl -sf http://localhost:3001 >/dev/null 2>&1; then
+        echo "→ (re)starting Next.js on 3000 + 3001..."
+        pkill -f "next dev" 2>/dev/null || true
+        sleep 1
+        nohup npm run dev > /tmp/kahoot-dev.log 2>&1 &
+        (cd "{{ qa_worktree }}" && nohup npm run dev -- -p 3001 > /tmp/qa-next.log 2>&1 &)
+        for i in {1..30}; do curl -sf http://localhost:3000 >/dev/null 2>&1 && curl -sf http://localhost:3001 >/dev/null 2>&1 && break; sleep 1; done
+    fi
+    echo "✓ Next.js (3000 quiz, 3001 Q&A)"
+
+    # 6. Auto-load curriculum quizzes
+    just load-quizzes
+
+    # 7. Local IP (so phones on the same wifi can join)
+    LAN_IP=$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null || echo "192.168.x.x")
+
+    echo ""
+    echo "──────────────────────────────────────────────────────"
+    echo " LOCAL TEST MODE (no public exposure)"
+    echo ""
+    echo " On your laptop:"
+    echo "   Quiz host:       http://localhost:3000/host/dashboard"
+    echo "   Past games:      http://localhost:3000/host/dashboard/past-games"
+    echo "   Player tracking: http://localhost:3000/host/dashboard/players"
+    echo "   Q&A teacher:     http://localhost:3001/host/qa"
+    echo "   Q&A student:     http://localhost:3001/qa"
+    echo ""
+    echo " Phones on the SAME wifi (replace if IP is wrong):"
+    echo "   Quiz player:     http://${LAN_IP}:3000/game/<game-id from QR>"
+    echo "   Q&A student:     http://${LAN_IP}:3001/qa"
+    echo ""
+    echo " To go public later: \`just start\` (ngrok) or run cloudflared manually."
+    echo "──────────────────────────────────────────────────────"
+
 # Auto-load every `Data Track/Week */assets/week_*__live_quiz.sql` from the curriculum repo into the running Supabase. Idempotent — replaces in place.
 load-quizzes:
     #!/usr/bin/env bash
