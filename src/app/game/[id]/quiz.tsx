@@ -17,24 +17,37 @@ export default function Quiz({
   questionCount: questionCount,
   participantId: playerId,
   isAnswerRevealed,
+  questionStartedAt,
 }: {
   question: Question
   questionCount: number
   participantId: string
   isAnswerRevealed: boolean
+  questionStartedAt: string | null
 }) {
   const [chosenChoice, setChosenChoice] = useState<Choice | null>(null)
-
   const [hasShownChoices, setHasShownChoices] = useState(false)
-
   const [questionStartTime, setQuestionStartTime] = useState(Date.now())
 
   // Shuffle once per question so the correct answer isn't always in position 0
   const shuffledChoices = useMemo(() => shuffled(question.choices), [question.id])
 
+  // Elapsed ms since the host started this question (accounts for network delay)
+  const elapsedMs = questionStartedAt
+    ? Math.max(0, Date.now() - new Date(questionStartedAt).getTime())
+    : 0
+  const preRevealRemaining = Math.max(0, TIME_TIL_CHOICE_REVEAL - elapsedMs)
+  const answerRemaining = Math.max(0, QUESTION_ANSWER_TIME - Math.max(0, elapsedMs - TIME_TIL_CHOICE_REVEAL))
+
   useEffect(() => {
     setChosenChoice(null)
-    setHasShownChoices(false)
+    if (preRevealRemaining === 0) {
+      // Already past the pre-reveal delay — jump straight to choices
+      setHasShownChoices(true)
+      setQuestionStartTime(Date.now() - Math.max(0, elapsedMs - TIME_TIL_CHOICE_REVEAL))
+    } else {
+      setHasShownChoices(false)
+    }
   }, [question.id])
 
   const answer = async (choice: Choice) => {
@@ -82,12 +95,14 @@ export default function Quiz({
       {!hasShownChoices && !isAnswerRevealed && (
         <div className="flex-grow text-transparent flex justify-center">
           <CountdownCircleTimer
+            key={`pre-${question.id}`}
             onComplete={() => {
               setHasShownChoices(true)
               setQuestionStartTime(Date.now())
             }}
             isPlaying
             duration={TIME_TIL_CHOICE_REVEAL / 1000}
+            initialRemainingTime={preRevealRemaining / 1000}
             colors={['#fff', '#fff', '#fff', '#fff']}
             trailColor={'transparent' as ColorFormat}
             colorsTime={[7, 5, 2, 0]}
@@ -209,10 +224,27 @@ export default function Quiz({
         </div>
       )}
 
-      <div className="flex text-white py-2 px-4 items-center bg-black">
+      <div className="flex text-white py-2 px-4 items-center justify-between bg-black">
         <div className="text-2xl">
           {question.order + 1}/{questionCount}
         </div>
+        {hasShownChoices && !isAnswerRevealed && (
+          <CountdownCircleTimer
+            key={`ans-${question.id}`}
+            isPlaying={!chosenChoice}
+            duration={QUESTION_ANSWER_TIME / 1000}
+            initialRemainingTime={answerRemaining / 1000}
+            colors={['#22c55e', '#eab308', '#ef4444', '#ef4444']}
+            colorsTime={[20, 10, 5, 0]}
+            size={52}
+            strokeWidth={5}
+            trailColor="#374151"
+          >
+            {({ remainingTime }) => (
+              <span className="text-white text-sm font-bold">{remainingTime}</span>
+            )}
+          </CountdownCircleTimer>
+        )}
       </div>
     </div>
   )

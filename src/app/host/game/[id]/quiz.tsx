@@ -32,6 +32,7 @@ export default function Quiz({
       updateData = {
         current_question_sequence: question.order + 1,
         is_answer_revealed: false,
+        question_started_at: new Date().toISOString(),
       }
     }
 

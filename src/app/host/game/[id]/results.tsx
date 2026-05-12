@@ -30,6 +30,7 @@ export default function Results({
   const [gameResults, setGameResults] = useState<GameResult[]>([])
   const [answers, setAnswers] = useState<AnswerRow[]>([])
   const [choicesByQuestion, setChoicesByQuestion] = useState<Map<string, ChoiceRow[]>>(new Map())
+  const [winnerCorrectCount, setWinnerCorrectCount] = useState<number | null>(null)
 
   const { width, height } = useWindowSize()
 
@@ -42,6 +43,19 @@ export default function Results({
         .order('total_score', { ascending: false })
       if (error) return alert(error.message)
       setGameResults(data)
+
+      // Correct count for the winner — query directly by participant_id so it
+      // works even when the broader answers grid hasn't loaded yet.
+      if (data && data.length > 0) {
+        const winnerId = (data[0] as any).participant_id
+        const questionIds = quizSet.questions.map((q: any) => q.id)
+        const { data: winAns } = await supabase
+          .from('answers')
+          .select('score')
+          .eq('participant_id', winnerId)
+          .in('question_id', questionIds)
+        setWinnerCorrectCount((winAns ?? []).filter((a: any) => a.score > 0).length)
+      }
     }
 
     const getAnswerGrid = async () => {
@@ -132,6 +146,12 @@ export default function Results({
                 {winner.total_score}
                 <span className="text-lg ml-2 font-normal text-gray-500">pts</span>
               </span>
+              {winnerCorrectCount !== null && (
+                <span className="text-xl mt-3 text-gray-600">
+                  {winnerCorrectCount}
+                  <span className="text-base text-gray-400"> / {quizSet.questions.length} correct</span>
+                </span>
+              )}
             </div>
           ) : (
             <p className="text-white/70 italic mt-12">No scores recorded.</p>
