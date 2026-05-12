@@ -1,5 +1,7 @@
 'use client'
 
+export const runtime = 'edge'
+
 import React, { FormEvent, useEffect, useRef, useState } from 'react'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { Choice, Game, Participant, Question, supabase } from '@/types/types'

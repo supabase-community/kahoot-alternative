@@ -1,4 +1,4 @@
-import { TIME_TIL_CHOICE_REVEAL } from '@/constants'
+import { QUESTION_ANSWER_TIME, TIME_TIL_CHOICE_REVEAL } from '@/constants'
 import { Answer, Participant, Question, supabase } from '@/types/types'
 import { useEffect, useRef, useState } from 'react'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
@@ -155,7 +155,7 @@ export default function Quiz({
                   onTimeUp()
                 }}
                 isPlaying
-                duration={20}
+                duration={QUESTION_ANSWER_TIME / 1000}
                 colors={['#004777', '#F7B801', '#A30000', '#A30000']}
                 colorsTime={[7, 5, 2, 0]}
               >

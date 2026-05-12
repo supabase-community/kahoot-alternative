@@ -1,6 +1,15 @@
 import { QUESTION_ANSWER_TIME, TIME_TIL_CHOICE_REVEAL } from '@/constants'
 import { Choice, Question, supabase } from '@/types/types'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+
+function shuffled<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 import { ColorFormat, CountdownCircleTimer } from 'react-countdown-circle-timer'
 
 export default function Quiz({
@@ -19,6 +28,9 @@ export default function Quiz({
   const [hasShownChoices, setHasShownChoices] = useState(false)
 
   const [questionStartTime, setQuestionStartTime] = useState(Date.now())
+
+  // Shuffle once per question so the correct answer isn't always in position 0
+  const shuffledChoices = useMemo(() => shuffled(question.choices), [question.id])
 
   useEffect(() => {
     setChosenChoice(null)
@@ -89,7 +101,7 @@ export default function Quiz({
         <div className="flex-grow flex flex-col items-stretch">
           <div className="flex-grow"></div>
           <div className="flex justify-between flex-wrap p-4">
-            {question.choices.map((choice, index) => (
+            {shuffledChoices.map((choice, index) => (
               <div key={choice.id} className="w-1/2 p-1">
                 <button
                   onClick={() => answer(choice)}

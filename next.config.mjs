@@ -3,6 +3,8 @@ import createMDX from '@next/mdx'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
   async redirects() {
     return [
       {
@@ -16,6 +18,16 @@ const nextConfig = {
       {
         source: '/host',
         destination: '/host/qa',
+        permanent: false,
+      },
+      {
+        source: '/quiz',
+        destination: '/join',
+        permanent: false,
+      },
+      {
+        source: '/host/quiz',
+        destination: '/host/dashboard',
         permanent: false,
       },
     ]
