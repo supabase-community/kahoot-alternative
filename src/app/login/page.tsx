@@ -3,11 +3,6 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FormEvent, Suspense, useState } from 'react'
 
-const PASSWORDS: Record<'host' | 'client', string> = {
-  host: 'hosthyf2026',
-  client: 'hyf2025',
-}
-
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -16,12 +11,19 @@ function LoginForm() {
 
   const [input, setInput] = useState('')
   const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (input === PASSWORDS[role]) {
-      const cookie = role === 'host' ? 'hyf_host' : 'hyf_client'
-      document.cookie = `${cookie}=1; path=/; max-age=43200; SameSite=Lax`
+    setLoading(true)
+    setError(false)
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, password: input }),
+    })
+    setLoading(false)
+    if (res.ok) {
       router.push(next)
     } else {
       setError(true)
@@ -49,9 +51,10 @@ function LoginForm() {
           )}
           <button
             type="submit"
-            className="bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className="bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-60"
           >
-            Enter
+            {loading ? 'Checking…' : 'Enter'}
           </button>
         </form>
       </div>
