@@ -1,62 +1,61 @@
+# HYF Live Quiz
 
-# Open source Kahoot alternative
+Live quiz tool used during [HackYourFuture](https://www.hackyourfuture.net/) Data Track classes. Forked from [supabase-community/kahoot-alternative](https://github.com/supabase-community/kahoot-alternative) and deployed at **[hyf-live-qa.pages.dev](https://hyf-live-qa.pages.dev)**.
 
-This is an open source Kahoot alternative , a game-based learning platform that brings engagement and fun at school, work, and at home.
-This project aims to provide similar functionality to Kahoot while being customizable and extensible for various educational and entertainment purposes.
+## How it works
 
+1. The host opens `/host` and starts a game
+2. Students go to `/join` and enter the game code
+3. The host advances questions; everyone's timer stays in sync
+4. Results show the winner, per-player rankings, and a per-question answer grid
 
-1. The host starts the game
-1. Players join the game
-1. The host starts the questions
-1. Players answer the questions
-1. Results are shown
+## URLs
 
+| Route | Who | Purpose |
+|---|---|---|
+| `/join` | Students | Enter a game code to join |
+| `/qa` | Students | Live Q&A board |
+| `/host/dashboard` | Host | Create and manage games |
+| `/host/game/[id]` | Host | Run a live game |
 
-##  Built With
-* [Nextjs](https://nextjs.org/)
-* [Supabase](https://supabase.com/)
-* [Tailwind CSS](https://tailwindcss.com/)
+Both `/host/*` and student routes are password-protected (separate passwords).
 
+## Deploy
 
-## Run Locally
+Pushes to `main` auto-deploy to Cloudflare Pages via GitHub Actions.
+
+To deploy manually:
+
 ```sh
-# Install dependencies 
-
-npm install
-
-# Start Supabase
-
-supabase start
-
-# Start Next.js locally
-
-npm run dev
-
-# Access app in your web browser at `http://localhost:3000`. 
-
+npm run pages:deploy
 ```
 
-Access the project root at / to join as a player.
+Required secrets (set in GitHub repo settings and Cloudflare Pages):
 
-Access /host to join as a host.
+| Secret | Where used |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | GitHub Actions → wrangler deploy |
+| `CLOUDFLARE_ACCOUNT_ID` | GitHub Actions → wrangler deploy |
+| `NEXT_PUBLIC_SUPABASE_URL` | Build-time env var |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Build-time env var |
+| `HOST_PASSWORD` | Cloudflare Pages runtime |
+| `CLIENT_PASSWORD` | Cloudflare Pages runtime |
 
-## Generate Types
+## Run locally
 
-`supabase gen types typescript --local --schema public > src/types/supabase.ts`
+```sh
+npm install
+supabase start
+npm run dev
+```
 
-[read more on generating types](https://supabase.com/docs/guides/api/rest/generating-types)
+## Built with
 
-
-## Contributing
-
-We welcome contributions from the community! If you'd like to contribute, please follow these guidelines:
-
-1. Fork the repository.
-2. Create your feature branch (`git checkout -b feature/YourFeature`).
-3. Commit your changes (`git commit -am 'Add some feature'`).
-4. Push to the branch (`git push origin feature/YourFeature`).
-5. Create a new Pull Request.
+- [Next.js](https://nextjs.org/)
+- [Supabase](https://supabase.com/)
+- [Cloudflare Pages](https://pages.cloudflare.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
 
 ## License
-This project is licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
 
+[MIT](LICENSE)
