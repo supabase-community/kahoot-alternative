@@ -68,9 +68,12 @@ export default function Quiz({
     // isAnswerRevealed state starts at false even when the DB row already
     // says true (e.g. all players answered before the host refreshed).
     const hydrate = async () => {
+      const participantIds = participants.map((p) => p.id)
       const [{ data: gameRow }, { data: existingAnswers }] = await Promise.all([
         supabase.from('games').select('is_answer_revealed').eq('id', gameId).single(),
-        supabase.from('answers').select().eq('question_id', question.id),
+        participantIds.length > 0
+          ? supabase.from('answers').select().eq('question_id', question.id).in('participant_id', participantIds)
+          : Promise.resolve({ data: [] }),
       ])
       if (gameRow) setIsAnswerRevealed(!!gameRow.is_answer_revealed)
       if (existingAnswers) setAnswers(existingAnswers as Answer[])
@@ -88,13 +91,16 @@ export default function Quiz({
           filter: `question_id=eq.${question.id}`,
         },
         (payload) => {
+          const incoming = payload.new as Answer
+          // Ignore answers from participants outside this game
+          if (!participants.some((p) => p.id === incoming.participant_id)) return
           setAnswers((currentAnswers) => {
             // de-duplicate against hydration so the auto-reveal threshold
             // counts the same answer once
-            if (currentAnswers.some((a) => a.id === (payload.new as Answer).id)) {
+            if (currentAnswers.some((a) => a.id === incoming.id)) {
               return currentAnswers
             }
-            return [...currentAnswers, payload.new as Answer]
+            return [...currentAnswers, incoming]
           })
 
           if (
