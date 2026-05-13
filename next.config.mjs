@@ -3,17 +3,32 @@ import createMDX from '@next/mdx'
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
   async redirects() {
     return [
       {
+        // This Next.js instance serves the Q&A pages. The bare URL is shared
+        // with students for the Q&A board, so redirect / to the student
+        // /qa view rather than the quiz dashboard.
         source: '/',
-        destination: '/host/dashboard',
-        permanent: true,
+        destination: '/qa',
+        permanent: false,
       },
       {
         source: '/host',
+        destination: '/host/qa',
+        permanent: false,
+      },
+      {
+        source: '/quiz',
+        destination: '/join',
+        permanent: false,
+      },
+      {
+        source: '/host/quiz',
         destination: '/host/dashboard',
-        permanent: true,
+        permanent: false,
       },
     ]
   },

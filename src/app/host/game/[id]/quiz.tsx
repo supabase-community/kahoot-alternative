@@ -1,4 +1,4 @@
-import { TIME_TIL_CHOICE_REVEAL } from '@/constants'
+import { QUESTION_ANSWER_TIME, TIME_TIL_CHOICE_REVEAL } from '@/constants'
 import { Answer, Participant, Question, supabase } from '@/types/types'
 import { useEffect, useRef, useState } from 'react'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
@@ -32,6 +32,7 @@ export default function Quiz({
       updateData = {
         current_question_sequence: question.order + 1,
         is_answer_revealed: false,
+        question_started_at: new Date().toISOString(),
       }
     }
 
@@ -55,13 +56,26 @@ export default function Quiz({
   }
 
   useEffect(() => {
-    setIsAnswerRevealed(false)
     setHasShownChoices(false)
     setAnswers([])
 
     setTimeout(() => {
       setHasShownChoices(true)
     }, TIME_TIL_CHOICE_REVEAL)
+
+    // Re-hydrate state from the DB so a host page refresh in the middle of a
+    // question doesn't bury the Next button. Without this the local
+    // isAnswerRevealed state starts at false even when the DB row already
+    // says true (e.g. all players answered before the host refreshed).
+    const hydrate = async () => {
+      const [{ data: gameRow }, { data: existingAnswers }] = await Promise.all([
+        supabase.from('games').select('is_answer_revealed').eq('id', gameId).single(),
+        supabase.from('answers').select().eq('question_id', question.id),
+      ])
+      if (gameRow) setIsAnswerRevealed(!!gameRow.is_answer_revealed)
+      if (existingAnswers) setAnswers(existingAnswers as Answer[])
+    }
+    hydrate()
 
     const channel = supabase
       .channel('answers')
@@ -75,6 +89,11 @@ export default function Quiz({
         },
         (payload) => {
           setAnswers((currentAnswers) => {
+            // de-duplicate against hydration so the auto-reveal threshold
+            // counts the same answer once
+            if (currentAnswers.some((a) => a.id === (payload.new as Answer).id)) {
+              return currentAnswers
+            }
             return [...currentAnswers, payload.new as Answer]
           })
 
@@ -86,12 +105,28 @@ export default function Quiz({
           }
         }
       )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'games',
+          filter: `id=eq.${gameId}`,
+        },
+        (payload) => {
+          // Keep local isAnswerRevealed synced with the DB so the Next button
+          // is visible whenever the question's answers have been revealed,
+          // regardless of which client triggered the reveal.
+          const g = payload.new as { is_answer_revealed: boolean }
+          setIsAnswerRevealed(!!g.is_answer_revealed)
+        }
+      )
       .subscribe()
 
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [question.id])
+  }, [question.id, gameId, participants.length])
 
   return (
     <div className="h-screen flex flex-col items-stretch bg-slate-900 relative">
@@ -121,7 +156,7 @@ export default function Quiz({
                   onTimeUp()
                 }}
                 isPlaying
-                duration={20}
+                duration={QUESTION_ANSWER_TIME / 1000}
                 colors={['#004777', '#F7B801', '#A30000', '#A30000']}
                 colorsTime={[7, 5, 2, 0]}
               >

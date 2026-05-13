@@ -3,7 +3,16 @@ import { Database } from './supabase'
 
 export const supabase = createClient<Database>(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  {
+    global: {
+      // Bypass the ngrok-free "Visit Site" interstitial on AJAX calls when
+      // the Supabase API is being tunnelled through ngrok. The header is
+      // ignored by direct localhost calls and by Supabase Cloud, so this is
+      // safe to leave in regardless of how Supabase is reached.
+      headers: { 'ngrok-skip-browser-warning': 'true' },
+    },
+  }
 )
 
 export type Participant = Database['public']['Tables']['participants']['Row']
