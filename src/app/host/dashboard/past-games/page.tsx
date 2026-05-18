@@ -133,6 +133,17 @@ export default function PastGames() {
                 <td className="py-2 pr-3 text-right">{c.total_pts}</td>
                 <td className="py-2 pr-3 text-right">
                   <div className="flex gap-2 justify-end">
+                    {g.quiz_set && (
+                      <Link
+                        href={`/host/quiz/${g.quiz_set_id}/preview`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 rounded bg-blue-100 text-blue-700 hover:bg-blue-200 text-xs"
+                        title="Walk through the quiz questions and answers without starting a game"
+                      >
+                        🔍 Walk-through
+                      </Link>
+                    )}
                     {finished && (
                       <Link
                         href={`/host/game/${g.id}`}

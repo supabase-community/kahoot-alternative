@@ -1,6 +1,7 @@
 'use client'
 
 import { QuizSet, supabase } from '@/types/types'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
@@ -89,6 +90,15 @@ export default function Home() {
                 >
                   🗑 Delete
                 </button>
+                <Link
+                  href={`/host/quiz/${quizSet.id}/preview`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-blue-100 text-blue-700 py-1 px-3 rounded hover:bg-blue-200 text-sm"
+                  title="Walk through the quiz questions and answers without starting a game"
+                >
+                  🔍 Preview
+                </Link>
                 <button
                   className="bg-green-500 text-white py-1 px-4 rounded"
                   onClick={() => startGame(quizSet.id)}
