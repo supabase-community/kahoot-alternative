@@ -4,6 +4,8 @@ import { QuizSet, supabase } from '@/types/types'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+export const runtime = 'edge'
+
 export default function QuizPreview({ params }: { params: { id: string } }) {
   const [quizSet, setQuizSet] = useState<QuizSet | null>(null)
   const [loading, setLoading] = useState(true)
