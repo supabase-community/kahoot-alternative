@@ -278,6 +278,12 @@ function Results({ participant, gameId }: { participant: Participant; gameId: st
                 )
               })}
             </div>
+            {inspect.question.explanation && (
+              <div className="mb-5 p-3 rounded bg-blue-900/40 border border-blue-700/60 text-sm">
+                <span className="font-semibold text-blue-200">Why: </span>
+                <span className="text-blue-100">{inspect.question.explanation}</span>
+              </div>
+            )}
             <button
               onClick={() => setInspect(null)}
               className="w-full py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm"
