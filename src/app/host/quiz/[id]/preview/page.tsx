@@ -19,8 +19,8 @@ export default function QuizPreview({ params }: { params: { id: string } }) {
         .from('quiz_sets')
         .select(`*, questions(*, choices(*))`)
         .eq('id', params.id)
-        .order('order', { foreignTable: 'questions', ascending: true })
-        .order('id', { foreignTable: 'questions.choices', ascending: true })
+        .order('order', { referencedTable: 'questions', ascending: true })
+        .order('id', { referencedTable: 'questions.choices', ascending: true })
         .single()
       if (error || !data) {
         setError(error?.message ?? 'Quiz not found')
