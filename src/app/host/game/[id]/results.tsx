@@ -221,7 +221,7 @@ export default function Results({
                         {gr.nickname}
                       </td>
                       {orderedQuestions.map((q) => {
-                        const cell = cellFor(gr.participant_id, q.id)
+                        const cell = cellFor(gr.participant_id!, q.id)
                         const bg =
                           cell.correct === true
                             ? 'bg-green-100'
