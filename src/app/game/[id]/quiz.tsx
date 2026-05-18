@@ -221,6 +221,12 @@ export default function Quiz({
               </svg>
             )}
           </div>
+          {question.explanation && (
+            <div className="mx-4 mt-4 p-3 rounded bg-white/95 border border-blue-200 max-w-md text-sm">
+              <span className="font-semibold text-blue-900">Why: </span>
+              <span className="text-blue-900">{question.explanation}</span>
+            </div>
+          )}
         </div>
       )}
 

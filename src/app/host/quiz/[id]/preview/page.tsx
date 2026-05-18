@@ -147,6 +147,12 @@ function QuestionCard({
           </li>
         ))}
       </ul>
+      {question.explanation && (
+        <div className="mt-3 p-3 rounded bg-blue-50 border border-blue-200 text-sm">
+          <span className="font-semibold text-blue-900">Why: </span>
+          <span className="text-blue-900">{question.explanation}</span>
+        </div>
+      )}
     </div>
   )
 }

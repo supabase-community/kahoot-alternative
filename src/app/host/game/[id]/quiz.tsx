@@ -226,6 +226,13 @@ export default function Quiz({
         )}
       </div>
 
+      {isAnswerRevealed && question.explanation && (
+        <div className="mx-4 mb-2 p-4 rounded bg-blue-50 border border-blue-200">
+          <span className="font-semibold text-blue-900">Why: </span>
+          <span className="text-blue-900 text-lg">{question.explanation}</span>
+        </div>
+      )}
+
       {hasShownChoices && (
         <div className="flex justify-between flex-wrap p-4">
           {question.choices.map((choice, index) => (
